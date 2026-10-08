@@ -1,9 +1,9 @@
-# GarisBola — verification
+# lekakick — verification
 
 ## Execution evidence
-- npm test: 10 unit/integration tests passed.
+- npm test: 11 unit/integration tests passed.
 - npm run typecheck and npm run build passed.
-- TEST_BASE_URL=http://5.189.131.6 npm run test:e2e: 5 Chromium browser tests passed against nginx/public IP.
+- TEST_BASE_URL=http://5.189.131.6 npm run test:e2e: 6 Chromium browser tests passed against nginx/public IP.
 - Browser coverage: search, source-link detail, no horizontal document overflow at 320/390/768/1440px, bookmark save/reload/delete, removal of 100 expired bookmarks without removing available/new IDs, HTTP share fallback, local fonts/images, no JavaScript page errors.
 - Axe WCAG 2/2.1 AA automated checks: no violations on desktop/mobile home, listing, saved, about, privacy routes tested. This is automated test coverage, not a formal accessibility certification.
 - npm audit --omit=dev: zero reported vulnerabilities. scripts/security-scan.mjs: no flagged patterns.
@@ -17,6 +17,9 @@
 Surface: Explore, editorial news browsing. Score: 0/10 for the ten claude-design slop tells. No tech gradient, generic indigo, feature-tile marketing grid, accent rails, blur, fake stats, icon toppers, centered stack, default Inter, or mismatched composition. The news-image shade exists only for text contrast. Numbered news list is ordering, not popularity or audience data.
 
 Screenshot review: desktop/mobile images and fonts loaded, no overlap or stretched images observed. Mobile category/topic strips intentionally scroll horizontally; document itself does not overflow. News thumbnails use editorial crops; full source captions are available on detail pages.
+
+## Rebranding verification
+Public name is exactly `lekakick`. Logo text, page titles, social metadata, footer, about/privacy copy, image placeholder, application log and RSS User-Agent updated. All public page variants and fallback illustration tested; prior localStorage bookmarks remain accessible. Internal service/cache names retained intentionally. Public browser suite rerun successfully after restart; asset versions bumped for changed JavaScript and illustration.
 
 ## Review corrections
 Independent review found two logic defects: unavailable bookmarks could fill the limit, and emoji/CJK-only titles could have empty slugs. Both were reproduced with failing tests, fixed by a separate agent, and rerun by the parent. Detail URLs for emoji/CJK titles now return 200. The deployed frontend includes an explicit expired-bookmark cleanup action; fresh browser tests passed against the public site.

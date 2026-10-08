@@ -36,7 +36,7 @@ export function createApp(store: {snapshot(): Snapshot}) {
     const state = store.snapshot();
     res.locals = {
       ...res.locals, state, categories:CATEGORIES, categoryName, articlePath, date,
-      title:'GarisBola — Kabar bola, dari semua sisi.',
+      title:'lekakick — Kabar bola, dari semua sisi.',
       description:'Kurasi berita sepak bola Indonesia dan dunia. Ikuti kabar Timnas, Liga Indonesia, hingga bursa transfer dengan sumber yang jelas.',
       section:'beranda', q:'', category:'semua', article:null,
       today: new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date()),
@@ -54,7 +54,7 @@ export function createApp(store: {snapshot(): Snapshot}) {
   });
   app.get('/berita', (req,res) => {
     const result = queryArticles(store.snapshot().items, {q:req.query.q, category:req.query.kategori, page:req.query.halaman});
-    res.render('listing', {...result, section:'berita', title:`${result.q ? `Hasil pencarian: ${result.q}` : categoryName(result.category)} — GarisBola`,
+    res.render('listing', {...result, section:'berita', title:`${result.q ? `Hasil pencarian: ${result.q}` : categoryName(result.category)} — lekakick`,
       pageLink:(page:number) => `/berita?${new URLSearchParams({kategori:result.category,q:result.q,halaman:String(page)})}`,
     });
   });
@@ -62,18 +62,18 @@ export function createApp(store: {snapshot(): Snapshot}) {
     const article = store.snapshot().items.find(item => item.id === req.params.id);
     if (!article) return res.status(404).render('not-found');
     if (req.params.slug !== article.slug) return res.redirect(301,articlePath(article));
-    res.render('article', {article, title:`${article.title} — GarisBola`, description:article.excerpt, category:article.category, section:'berita',
+    res.render('article', {article, title:`${article.title} — lekakick`, description:article.excerpt, category:article.category, section:'berita',
       related:store.snapshot().items.filter(item => item.category === article.category && item.id !== article.id).slice(0,3),
     });
   });
-  app.get('/simpan', (_req,res) => res.render('saved', {section:'simpan', title:'Bacaan saya — GarisBola'}));
+  app.get('/simpan', (_req,res) => res.render('saved', {section:'simpan', title:'Bacaan saya — lekakick'}));
   app.get('/api/berita', (req,res) => {
     const ids = typeof req.query.ids === 'string' ? req.query.ids.split(',').filter(id => /^[a-f0-9]{16}$/.test(id)).slice(0,100) : [];
     const items = store.snapshot().items.filter(item => ids.includes(item.id)).map(item => ({...item, path:articlePath(item), categoryLabel:categoryName(item.category), dateLabel:date(item.publishedAt)}));
     res.json({items});
   });
-  app.get('/tentang', (_req,res) => res.render('info', {section:'tentang', title:'Tentang GarisBola', kind:'about'}));
-  app.get('/privasi', (_req,res) => res.render('info', {section:'privasi', title:'Privasi — GarisBola', kind:'privacy'}));
+  app.get('/tentang', (_req,res) => res.render('info', {section:'tentang', title:'Tentang lekakick', kind:'about'}));
+  app.get('/privasi', (_req,res) => res.render('info', {section:'privasi', title:'Privasi — lekakick', kind:'privacy'}));
   app.get('/robots.txt', (_req,res) => res.type('text/plain').send('User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /simpan\n'));
   app.use((_req,res) => res.status(404).render('not-found'));
   app.use((error:Error,_req:express.Request,res:express.Response,_next:express.NextFunction) => {

@@ -1,5 +1,5 @@
 [Unit]
-Description=GarisBola Indonesian Football News Portal
+Description=lekakick Indonesian Football News Portal
 After=network-online.target
 Wants=network-online.target
 

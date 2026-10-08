@@ -1,4 +1,4 @@
-# GarisBola
+# lekakick
 
 Portal kurasi berita sepak bola berbahasa Indonesia. Source workspace: `/root/web`.
 Deployment: `/opt/garisbola`. Public URL: `http://5.189.131.6/`.
@@ -33,6 +33,9 @@ Playwright memakai server sementara port 4318 dan RSS nyata. Unit/integration te
 Untuk menguji situs yang sudah deploy:
 
     TEST_BASE_URL=http://5.189.131.6 npm run test:e2e
+
+## Branding
+Nama publik resmi: `lekakick` (huruf kecil). Nama layanan, direktori deployment/cache, dan key localStorage `garisbola.saved.v1` sengaja dipertahankan sebagai identifier internal agar deployment dan bookmark pembaca tidak terputus saat perubahan merek.
 
 ## Production
 Nginx HTTP :80 -> Node 127.0.0.1:4317. Layanan systemd DynamicUser, ProtectHome, read-only application, memory/CPU limits, restart-on-failure, enabled at boot.

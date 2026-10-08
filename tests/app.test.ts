@@ -14,7 +14,7 @@ test('pengunjung dapat membuka beranda, mencari, membaca ringkasan, dan mendapat
     const home = await fetch(base);
     assert.equal(home.status, 200);
     const html = await home.text();
-    assert.match(html, /GarisBola/);
+    assert.match(html, /lekakick/);
     assert.match(html, /Timnas Indonesia berlatih/);
     assert.match(home.headers.get('content-security-policy')!, /script-src 'self'/);
     const search = await fetch(`${base}/berita?q=zzzz`);

@@ -8,7 +8,7 @@ const store = new NewsStore({dataDir:process.env.DATA_DIR || path.resolve('data'
 await store.init();
 const app = createApp(store);
 const server = app.listen(port, process.env.HOST || '127.0.0.1', () => {
-  console.info(`GarisBola siap di port ${port}; ${store.snapshot().items.length} berita dari RSS`);
+  console.info(`lekakick siap di port ${port}; ${store.snapshot().items.length} berita dari RSS`);
 });
 server.requestTimeout = 15_000;
 server.headersTimeout = 20_000;

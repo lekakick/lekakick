@@ -14,7 +14,7 @@ export interface Snapshot { items: Article[]; updatedAt: string | null; lastAtte
 async function fetchXml(url: string): Promise<string> {
   const response = await fetch(url, {
     signal: AbortSignal.timeout(12_000), redirect: 'error',
-    headers: { 'User-Agent': 'GarisBola/1.0 RSS Reader', Accept: 'application/rss+xml, application/xml, text/xml' },
+    headers: { 'User-Agent': 'lekakick/1.0 RSS Reader', Accept: 'application/rss+xml, application/xml, text/xml' },
   });
   if (!response.ok || !response.body) throw new Error(`RSS HTTP ${response.status}`);
   const chunks: Uint8Array[] = [];

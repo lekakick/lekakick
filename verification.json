@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-08T19:45:07.829Z",
+  "verifiedAt": "2026-10-08T19:59:39.974Z",
   "base": "http://5.189.131.6",
   "routes": [
     {
@@ -47,7 +47,7 @@
       "status": 200
     },
     {
-      "route": "/assets/app.js?v=2",
+      "route": "/assets/app.js?v=3",
       "status": 200
     },
     {
@@ -82,7 +82,7 @@
   "health": {
     "status": "ok",
     "articles": 77,
-    "updatedAt": "2026-10-08T19:43:59.391Z",
+    "updatedAt": "2026-10-08T19:59:14.528Z",
     "degraded": false
   }
 }

@@ -37,9 +37,9 @@ function savedCard(item) {
   imageLink.tabIndex = -1;
   imageLink.setAttribute('aria-hidden', 'true');
   const image = element('img');
-  image.src = item.image || '/assets/placeholder.svg';
+  image.src = item.image || '/assets/placeholder.svg?v=2';
   image.alt = ''; image.loading = 'lazy'; image.width = 800; image.height = 533;
-  image.addEventListener('error', () => { image.src = '/assets/placeholder.svg'; }, {once:true});
+  image.addEventListener('error', () => { image.src = '/assets/placeholder.svg?v=2'; }, {once:true});
   imageLink.append(image);
   const content = element('div','card-content');
   const meta = element('div','article-meta');
@@ -148,6 +148,6 @@ document.querySelector('[data-share]')?.addEventListener('click', async () => {
 });
 document.querySelectorAll('img').forEach(image => {
   image.addEventListener('error', () => {
-    if (!image.src.endsWith('/assets/placeholder.svg')) image.src = '/assets/placeholder.svg';
+    if (!image.src.endsWith('/assets/placeholder.svg?v=2')) image.src = '/assets/placeholder.svg?v=2';
   }, {once:true});
 });
