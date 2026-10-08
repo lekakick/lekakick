@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#173d2a">
+  <title><%= title %></title><meta name="description" content="<%= description %>">
+  <meta property="og:title" content="<%= title %>"><meta property="og:description" content="<%= description %>">
+  <meta property="og:type" content="<%= article ? 'article' : 'website' %>"><meta property="og:locale" content="id_ID"><meta property="og:site_name" content="GarisBola">
+  <% if (article && article.image) { %><meta property="og:image" content="<%= article.image %>"><% } %>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preload" href="/assets/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/styles.css?v=1"><script src="/assets/app.js?v=2" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#konten">Langsung ke konten</a>
+<div class="topbar"><div class="container topbar-inner"><span><span class="status-dot"></span> SEPAK BOLA. TANPA BATAS.</span><span class="topbar-date"><%= today %></span><a href="/tentang">Tentang GarisBola <span aria-hidden="true">↗</span></a></div></div>
+<header class="site-header">
+  <div class="container masthead">
+    <a class="brand" href="/" aria-label="GarisBola beranda"><img src="/assets/favicon.svg" width="42" height="42" alt=""><span>GarisBola<span class="brand-period">.</span></span></a>
+    <span class="brand-caption">Kabar bola,<br>dari semua sisi.</span>
+    <form class="search-form" action="/berita" method="get" role="search">
+      <label class="sr-only" for="cari">Cari berita</label><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
+      <input id="cari" type="search" name="q" value="<%= q %>" placeholder="Cari klub, pemain, atau berita…" maxlength="100"><button type="submit" aria-label="Cari">↵</button>
+    </form>
+    <a class="saved-link" href="/simpan" aria-label="Bacaan saya"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg><span>Bacaan saya</span></a>
+  </div>
+  <div class="nav-wrap"><nav class="container nav" aria-label="Navigasi utama">
+    <a href="/" class="<%= section === 'beranda' ? 'active' : '' %>" <%- section === 'beranda' ? 'aria-current="page"' : '' %>>Beranda</a>
+    <a href="/berita" class="<%= section === 'berita' && category === 'semua' ? 'active' : '' %>">Berita Terbaru</a>
+    <% categories.filter(c => c.id !== 'semua').forEach(c => { %><a href="/berita?kategori=<%= c.id %>" class="<%= section === 'berita' && category === c.id ? 'active' : '' %>"><%= c.name %></a><% }); %>
+    <a class="nav-last" href="/berita?q=Indonesia"><span class="mini-flag" aria-hidden="true"></span> Rumahnya bola Indonesia <span aria-hidden="true">↗</span></a>
+  </nav></div>
+</header>
+<% if (state.degraded) { %><div class="container feed-notice" role="status">Sebagian sumber belum dapat diperbarui. <%= state.items.length ? 'Menampilkan berita yang terakhir tersimpan.' : 'Berita akan muncul setelah sumber kembali tersedia.' %></div><% } %>

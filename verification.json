@@ -1,0 +1,88 @@
+{
+  "verifiedAt": "2026-10-08T19:45:07.829Z",
+  "base": "http://5.189.131.6",
+  "routes": [
+    {
+      "route": "/",
+      "status": 200
+    },
+    {
+      "route": "/berita",
+      "status": 200
+    },
+    {
+      "route": "/berita?kategori=timnas",
+      "status": 200
+    },
+    {
+      "route": "/berita?kategori=liga-indonesia",
+      "status": 200
+    },
+    {
+      "route": "/berita?kategori=internasional",
+      "status": 200
+    },
+    {
+      "route": "/berita?kategori=transfer",
+      "status": 200
+    },
+    {
+      "route": "/berita?q=zzzzzz",
+      "status": 200
+    },
+    {
+      "route": "/simpan",
+      "status": 200
+    },
+    {
+      "route": "/tentang",
+      "status": 200
+    },
+    {
+      "route": "/privasi",
+      "status": 200
+    },
+    {
+      "route": "/assets/styles.css?v=1",
+      "status": 200
+    },
+    {
+      "route": "/assets/app.js?v=2",
+      "status": 200
+    },
+    {
+      "route": "/assets/favicon.svg",
+      "status": 200
+    },
+    {
+      "route": "/robots.txt",
+      "status": 200
+    },
+    {
+      "route": "/healthz",
+      "status": 200
+    },
+    {
+      "route": "/.env",
+      "status": 404
+    },
+    {
+      "route": "/package.json",
+      "status": 404
+    },
+    {
+      "route": "/src/app.ts",
+      "status": 404
+    },
+    {
+      "route": "/hilang",
+      "status": 404
+    }
+  ],
+  "health": {
+    "status": "ok",
+    "articles": 77,
+    "updatedAt": "2026-10-08T19:43:59.391Z",
+    "degraded": false
+  }
+}
