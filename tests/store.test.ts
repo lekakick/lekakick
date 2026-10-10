@@ -7,12 +7,14 @@ test('cache RSS bertahan setelah restart dan tetap tersedia saat sumber gagal', 
   const { NewsStore } = await import('../src/store.js');
   const dir = await mkdtemp(`${process.env.TMPDIR || '/root/.hermes/cache/scratch'}/garisbola-test-`);
   try {
-    const store = new NewsStore({dataDir: dir, fetchXml: async () => feed});
+    const { FEEDS } = await import('../src/sources.js');
+    const feeds = FEEDS.filter(f => f.sourceId === 'antara');
+    const store = new NewsStore({dataDir: dir, feeds, fetchXml: async () => feed});
     await store.init();
     assert.equal(store.snapshot().items.length, 1);
     assert.ok(store.snapshot().updatedAt);
     assert.equal(store.snapshot().degraded, false);
-    const offline = new NewsStore({dataDir: dir, fetchXml: async () => { throw new Error('offline'); }});
+    const offline = new NewsStore({dataDir: dir, feeds, fetchXml: async () => { throw new Error('offline'); }});
     await offline.init();
     assert.equal(offline.snapshot().items.length, 1);
     assert.equal(offline.snapshot().degraded, true);

@@ -5,10 +5,12 @@ Deployment: `/opt/garisbola`. Public URL: `http://5.189.131.6/`.
 
 ## Fitur
 - Beranda editorial responsif, berita utama, kategori, pencarian, pagination.
-- Halaman ringkasan RSS dengan atribusi ANTARA, waktu terbit asli, kredit foto, dan tautan laporan lengkap.
+- Halaman ringkasan RSS dengan atribusi ANTARA News, detikSport, Bola.com, atau Tempo, waktu terbit asli, kredit foto, dan tautan laporan lengkap.
 - Bacaan saya memakai localStorage; bagikan via Web Share/clipboard dengan dialog salin sebagai fallback HTTP.
 - SSR HTML, metadata Open Graph, font lokal, CSP, input escaping, URL allowlist, pembatasan RSS.
-- Empat feed ANTARA diperiksa setiap 10 menit. Cache disk atomik bertahan saat restart/outage.
+- Sebelas feed RSS dari empat penerbit diperiksa otomatis setiap 5 menit, tanpa perlu pengunjung. Cache disk atomik bertahan saat restart/outage; satu sumber gagal tidak mematikan sumber lain.
+- Filter penerbit pada daftar berita; status koneksi, jumlah berita, dan pemeriksaan terakhir per penerbit pada `/tentang#sumber`.
+- Beranda/daftar berita memeriksa metadata `/api/status` setiap 60 detik saat tab aktif. Revisi konten baru memunculkan tombol muat ulang, bukan me-refresh otomatis saat pembaca membaca.
 - Halaman kosong/404/privasi/sumber. Tidak ada skor live, klasemen fiktif, akun, CMS, atau newsletter semu.
 
 ## Development
@@ -18,7 +20,8 @@ Node.js >=24.
     npm ci
     npm run dev
 
-Default listen: `127.0.0.1:4317`. Environment: HOST, PORT, DATA_DIR.
+Default listen: `127.0.0.1:4317`. Environment: HOST, PORT, DATA_DIR, REFRESH_INTERVAL_MS (default 300000; minimum 1000, interval kecil hanya untuk pengujian).
+Konfigurasi penerbit, feed, dan allowlist gambar/tautan ada di `src/sources.ts`. Scheduler menunggu 5 menit setelah siklus selesai agar tidak overlap. Request timeout 12 detik; satu retry hanya untuk koneksi terputus sementara, tetap dalam deadline awal. Conditional ETag/Last-Modified dipakai jika tersedia. Tidak ada endpoint publik untuk memaksa refresh.
 
 ## Tests
 
@@ -33,6 +36,12 @@ Playwright memakai server sementara port 4318 dan RSS nyata. Unit/integration te
 Untuk menguji situs yang sudah deploy:
 
     TEST_BASE_URL=http://5.189.131.6 npm run test:e2e
+
+Untuk membuktikan satu siklus otomatis pada layanan aktif tanpa restart atau trigger manual:
+
+    node scripts/verify-auto-update.mjs
+
+Perintah menunggu foreground hingga sekitar 6 menit dan menulis bukti `qa/automatic-cycle.json`. Status kesehatan multisumber ada di `/healthz` dan `/api/status` (no-store); informasi sumber yang gagal terlihat di `/tentang#sumber` dan log layanan.
 
 ## Branding
 Nama publik resmi: `lekakick` (huruf kecil). Nama layanan, direktori deployment/cache, dan key localStorage `garisbola.saved.v1` sengaja dipertahankan sebagai identifier internal agar deployment dan bookmark pembaca tidak terputus saat perubahan merek.
@@ -58,5 +67,5 @@ Config deploy tersimpan di `deploy/`; validasi `nginx -t` sebelum reload. Layana
 Domain belum diberikan; HTTPS belum dikonfigurasi. Setelah domain mengarah ke IP VPS, ubah server_name, pasang sertifikat tepercaya/auto-renew, redirect HTTP ke HTTPS, lalu aktifkan HSTS hanya setelah TLS tervalidasi.
 
 ## Batasan konten
-Ini aggregator RSS, bukan penerbit artikel penuh. Berita/foto tetap milik sumber. Penggunaan komersial harus mengikuti lisensi penerbit. Kategori berbasis kata kunci; tidak selalu sempurna. Arsip terbatas pada feed tersimpan (maksimum 300 item), sehingga bookmark lama dapat kedaluwarsa.
+Ini aggregator RSS, bukan penerbit artikel penuh. Berita/foto tetap milik sumber. Penggunaan komersial harus mengikuti lisensi penerbit. Kategori berbasis kata kunci; tidak selalu sempurna. Arsip dibatasi 1200 artikel (mempertahankan hingga 100 artikel nyata per penerbit, lalu mengisi dengan berita terbaru), sehingga bookmark lama dapat kedaluwarsa. Waktu terbit mengikuti RSS penerbit; tidak seluruh isi website penerbit tersedia di RSS. Tidak melakukan scraping artikel lengkap atau melewati paywall.
 Tidak ada kredensial, pembayaran, atau data pengguna di server. Bacaan tersimpan lokal di browser.

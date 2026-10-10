@@ -8,8 +8,10 @@ try {
   const page = await context.newPage();
   await page.goto('http://5.189.131.6/');
   await page.locator('.lead-story h2 a').click();
-  const source = page.getByRole('link',{name:'Baca selengkapnya di ANTARA'});
-  assert.match(await source.getAttribute('href'),/^https:\/\/www\.antaranews\.com\/berita\//);
+  const source = page.getByRole('link',{name:/Baca selengkapnya di /});
+  const sourceURL = new URL(await source.getAttribute('href'));
+  assert.equal(sourceURL.protocol,'https:');
+  assert.ok(['www.antaranews.com','sport.detik.com','www.bola.com','www.tempo.co'].includes(sourceURL.hostname));
   const mobile = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   assert.deepEqual(mobile.violations,[]);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true);

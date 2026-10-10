@@ -1,0 +1,115 @@
+{
+  "verifiedAt": "2026-10-08T20:42:16.079Z",
+  "base": "http://5.189.131.6",
+  "automaticCycleObserved": true,
+  "before": {
+    "status": "ok",
+    "articles": 541,
+    "updatedAt": "2026-10-08T20:37:10.167Z",
+    "lastAttemptAt": "2026-10-08T20:37:08.089Z",
+    "degraded": false,
+    "revision": "d0b67705f11ef13885851af31484b223b72aebcc845da25fd04757387a7f73c2",
+    "refreshIntervalMs": 300000,
+    "sources": [
+      {
+        "id": "antara",
+        "name": "ANTARA News",
+        "homepage": "https://www.antaranews.com/sepakbola",
+        "status": "ok",
+        "articleCount": 77,
+        "feedCount": 4,
+        "healthyFeeds": 4,
+        "lastSuccessAt": "2026-10-08T20:37:10.167Z",
+        "lastAttemptAt": "2026-10-08T20:37:08.089Z"
+      },
+      {
+        "id": "detik",
+        "name": "detikSport",
+        "homepage": "https://sport.detik.com/sepakbola",
+        "status": "ok",
+        "articleCount": 164,
+        "feedCount": 2,
+        "healthyFeeds": 2,
+        "lastSuccessAt": "2026-10-08T20:37:10.167Z",
+        "lastAttemptAt": "2026-10-08T20:37:08.089Z"
+      },
+      {
+        "id": "bola",
+        "name": "Bola.com",
+        "homepage": "https://www.bola.com",
+        "status": "ok",
+        "articleCount": 200,
+        "feedCount": 4,
+        "healthyFeeds": 4,
+        "lastSuccessAt": "2026-10-08T20:37:10.167Z",
+        "lastAttemptAt": "2026-10-08T20:37:08.089Z"
+      },
+      {
+        "id": "tempo",
+        "name": "Tempo",
+        "homepage": "https://www.tempo.co/sepakbola",
+        "status": "ok",
+        "articleCount": 100,
+        "feedCount": 1,
+        "healthyFeeds": 1,
+        "lastSuccessAt": "2026-10-08T20:37:10.167Z",
+        "lastAttemptAt": "2026-10-08T20:37:08.089Z"
+      }
+    ]
+  },
+  "after": {
+    "status": "ok",
+    "articles": 541,
+    "updatedAt": "2026-10-08T20:42:14.074Z",
+    "lastAttemptAt": "2026-10-08T20:42:10.706Z",
+    "degraded": false,
+    "revision": "d0b67705f11ef13885851af31484b223b72aebcc845da25fd04757387a7f73c2",
+    "refreshIntervalMs": 300000,
+    "sources": [
+      {
+        "id": "antara",
+        "name": "ANTARA News",
+        "homepage": "https://www.antaranews.com/sepakbola",
+        "status": "ok",
+        "articleCount": 77,
+        "feedCount": 4,
+        "healthyFeeds": 4,
+        "lastSuccessAt": "2026-10-08T20:42:14.074Z",
+        "lastAttemptAt": "2026-10-08T20:42:10.706Z"
+      },
+      {
+        "id": "detik",
+        "name": "detikSport",
+        "homepage": "https://sport.detik.com/sepakbola",
+        "status": "ok",
+        "articleCount": 164,
+        "feedCount": 2,
+        "healthyFeeds": 2,
+        "lastSuccessAt": "2026-10-08T20:42:14.074Z",
+        "lastAttemptAt": "2026-10-08T20:42:10.706Z"
+      },
+      {
+        "id": "bola",
+        "name": "Bola.com",
+        "homepage": "https://www.bola.com",
+        "status": "ok",
+        "articleCount": 200,
+        "feedCount": 4,
+        "healthyFeeds": 4,
+        "lastSuccessAt": "2026-10-08T20:42:14.074Z",
+        "lastAttemptAt": "2026-10-08T20:42:10.706Z"
+      },
+      {
+        "id": "tempo",
+        "name": "Tempo",
+        "homepage": "https://www.tempo.co/sepakbola",
+        "status": "ok",
+        "articleCount": 100,
+        "feedCount": 1,
+        "healthyFeeds": 1,
+        "lastSuccessAt": "2026-10-08T20:42:14.074Z",
+        "lastAttemptAt": "2026-10-08T20:42:10.706Z"
+      }
+    ]
+  }
+}

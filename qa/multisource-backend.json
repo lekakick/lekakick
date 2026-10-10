@@ -1,0 +1,344 @@
+{
+  "verifiedAt": "2026-10-08T20:19:41.327Z",
+  "fixtureCount": 8,
+  "testResults": {
+    "command": "npm test && npm run typecheck && npm run build && git diff --check",
+    "backendOnlyTests": 18,
+    "backendOnlyPassed": 18,
+    "tests": 25,
+    "passed": 25,
+    "failed": 0,
+    "exitCode": 0,
+    "tdd": "RED-GREEN vertical slices executed for parsing, URL security, store status/revision/coalescing, corrupt-cache migration, archive, conditional GET, scheduler/server, stale duplicate priority, in-flight status, and disk bounds"
+  },
+  "limitations": [
+    "Feed detik tersimpan berisi 100 item; 1 URL /juara-bola-dunia-2026/ sengaja ditolak karena di luar allowlist /sepakbola/.",
+    "HTTP 304 diuji deterministik dengan Response injection; pengujian jaringan langsung satu siklus menghasilkan HTTP 200 pada seluruh feed.",
+    "Arsip dibatasi 1200 artikel dengan reservasi hingga 100 artikel nyata per publisher, lalu diisi artikel terbaru."
+  ],
+  "fixtures": [
+    {
+      "filename": "/root/.hermes/cache/scratch/garisbola-antara.xml",
+      "sourceId": "antara",
+      "count": 20,
+      "images": 20,
+      "first": {
+        "id": "4ff70310707cf843",
+        "slug": "profil-karier-emil-audero-penjaga-gawang-di-final-asean-cup-2026",
+        "title": "Profil karier Emil Audero, penjaga gawang di Final ASEAN Cup 2026",
+        "excerpt": "Emil Audero menjadi salah satu nama yang paling disorot setelah Timnas Indonesia meraih gelar juara FIFA ASEAN Cup ...",
+        "url": "https://www.antaranews.com/berita/5774613/profil-karier-emil-audero-penjaga-gawang-di-final-asean-cup-2026",
+        "image": "https://cdn.antaranews.com/cache/800x533/2026/10/05/indonesia-juara-fifa-asean-cup-2026-2878692.jpg",
+        "imageCredit": "Ekspresi penjaga gawang Timnas Indonesia Emil Audero usai menggagalkan tendangan penalti pesepak bola Timnas Thailand dalam final FIFA ASEAN Cup 2026 di Stadion Utama Gelora Bung Karno (SUGBK), Senayan, Jakarta, Senin (5/10/2026). Indonesia juara setelah mengalahkan Thailand lewat adu penalti dengan skor 4-2. ANTARA FOTO/Rivan Awal Lingga/Lmo/rwa. (ANTARA FOTO/RIVAN AWAL LINGGA)",
+        "source": "ANTARA News",
+        "sourceId": "antara",
+        "category": "timnas",
+        "publishedAt": "2026-10-07T02:24:58.000Z"
+      }
+    },
+    {
+      "filename": "/root/.hermes/cache/scratch/lekakick-feeds/feed-0.xml",
+      "sourceId": "detik",
+      "count": 99,
+      "images": 99,
+      "first": {
+        "id": "b3fe0d8fcd2801cb",
+        "slug": "gelar-fifa-asean-cup-bisa-menginspirasi-anak-anak-indonesia",
+        "title": "Gelar FIFA ASEAN Cup Bisa Menginspirasi Anak-anak Indonesia",
+        "excerpt": "FIFA ASEAN Cup 2026 memang cuma kompetiti level Asia Tenggara, Tapi, sukses Indonesia jadi juara di sana diharapkan bisa menginspirasi anak-anak di Tanah Air.",
+        "url": "https://sport.detik.com/sepakbola/liga-indonesia/d-8698809/gelar-fifa-asean-cup-bisa-menginspirasi-anak-anak-indonesia",
+        "image": "https://akcdn.detik.net.id/community/media/visual/2026/10/09/timnas-indonesia-juara-fifa-asean-cup-2026-1791479951358_169.jpeg?w=360&q=90",
+        "imageCredit": "Foto: detikSport (via RSS)",
+        "source": "detikSport",
+        "sourceId": "detik",
+        "category": "internasional",
+        "publishedAt": "2026-10-08T19:00:20.000Z"
+      }
+    },
+    {
+      "filename": "/root/.hermes/cache/scratch/lekakick-feeds/feed-1.xml",
+      "sourceId": "detik",
+      "count": 100,
+      "images": 100,
+      "first": {
+        "id": "b3fe0d8fcd2801cb",
+        "slug": "gelar-fifa-asean-cup-bisa-menginspirasi-anak-anak-indonesia",
+        "title": "Gelar FIFA ASEAN Cup Bisa Menginspirasi Anak-anak Indonesia",
+        "excerpt": "FIFA ASEAN Cup 2026 memang cuma kompetiti level Asia Tenggara, Tapi, sukses Indonesia jadi juara di sana diharapkan bisa menginspirasi anak-anak di Tanah Air.",
+        "url": "https://sport.detik.com/sepakbola/liga-indonesia/d-8698809/gelar-fifa-asean-cup-bisa-menginspirasi-anak-anak-indonesia",
+        "image": "https://akcdn.detik.net.id/community/media/visual/2026/10/09/timnas-indonesia-juara-fifa-asean-cup-2026-1791479951358_169.jpeg?w=360&q=90",
+        "imageCredit": "Foto: detikSport (via RSS)",
+        "source": "detikSport",
+        "sourceId": "detik",
+        "category": "internasional",
+        "publishedAt": "2026-10-08T19:00:20.000Z"
+      }
+    },
+    {
+      "filename": "/root/.hermes/cache/scratch/lekakick-feeds/feed-2.xml",
+      "sourceId": "bola",
+      "count": 50,
+      "images": 50,
+      "first": {
+        "id": "8c701e65f9d06db8",
+        "slug": "java-united-datangkan-amunisi-impor-ketiga-di-deadline-day-bri-super-league-gelandang-serang-asal-brasil-resmi",
+        "title": "Java United Datangkan Amunisi Impor Ketiga di Deadline Day BRI Super League, Gelandang Serang asal Brasil Resmi Merapat",
+        "excerpt": "Java United kembali memperkuat skuad untuk BRI Super League musim ini dengan mendatangkan gelang serang asal Brasil.",
+        "url": "https://www.bola.com/indonesia/read/8309111/java-united-datangkan-amunisi-impor-ketiga-di-deadline-day-bri-super-league-gelandang-serang-asal-brasil-resmi-merapat",
+        "image": "https://cdn0-production-images-kly.akamaized.net/M5TYXLxbU95FC_0oC1QWkSjBaK0=/673x379/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/9369075/original/046932400_1791465695-WhatsApp_Image_2026-10-08_at_19.17.59.jpg",
+        "imageCredit": "Lukas Brambilla, gelandang asal Brasil milik Java United. (Dok. Java United FC)",
+        "source": "Bola.com",
+        "sourceId": "bola",
+        "category": "liga-indonesia",
+        "publishedAt": "2026-10-08T15:30:08.000Z"
+      }
+    },
+    {
+      "filename": "/root/.hermes/cache/scratch/lekakick-feeds/extra-1.xml",
+      "sourceId": "bola",
+      "count": 50,
+      "images": 50,
+      "first": {
+        "id": "114f94fe87272701",
+        "slug": "liverpool-terancam-tanpa-2-pilar-lawan-manchester-city-iraola-ungkap-kondisi-isak-dan-gakpo",
+        "title": "Liverpool Terancam Tanpa 2 Pilar Lawan Manchester City, Iraola Ungkap Kondisi Isak dan Gakpo",
+        "excerpt": "Liverpool masih menunggu kondisi Alexander Isak dan Cody Gakpo yang mengalami cedera saat membela timnas.",
+        "url": "https://www.bola.com/inggris/read/8309094/liverpool-terancam-tanpa-2-pilar-lawan-manchester-city-iraola-ungkap-kondisi-isak-dan-gakpo",
+        "image": "https://cdn1-production-images-kly.akamaized.net/MdMHnb3IRjn8GM08lMMrBU-ksIU=/673x379/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/5411144/original/025205900_1763003562-ugarte.jpg",
+        "imageCredit": "Penyerang Liverpool asal Swedia #09, Alexander Isak, berebut bola dengan bek Manchester United asal Inggris #23, Luke Shaw (kanan), dan gelandang Manchester United asal Uruguay #25, Manuel Ugarte (kiri), dalam pertandingan Premier League Inggris antara Liverpool dan Manchester United di Anfield, Liverpool, Inggris barat laut, pada 19 Oktober 2025. (PETER POWELL/AFP)",
+        "source": "Bola.com",
+        "sourceId": "bola",
+        "category": "internasional",
+        "publishedAt": "2026-10-08T15:15:29.000Z"
+      }
+    },
+    {
+      "filename": "/root/.hermes/cache/scratch/lekakick-feeds/extra-2.xml",
+      "sourceId": "bola",
+      "count": 50,
+      "images": 50,
+      "first": {
+        "id": "6b76b87be575d697",
+        "slug": "ruben-amorim-ungkap-pelajaran-dari-manchester-united-yang-membantunya-di-ac-milan",
+        "title": "Ruben Amorim Ungkap Pelajaran dari Manchester United yang Membantunya di AC Milan",
+        "excerpt": "Ruben Amorim menilai masa di Manchester United membentuk pendekatan melatihnya di AC Milan, sambil menghadapi jadwal padat dan tekanan yang mirip dengan Portuga",
+        "url": "https://www.bola.com/dunia/read/8309164/ruben-amorim-ungkap-pelajaran-dari-manchester-united-yang-membantunya-di-ac-milan",
+        "image": "https://cdn1-production-images-kly.akamaized.net/NJmI4wIb2Kb_eqKHspOwNEornP0=/673x379/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/9342009/original/071240100_1788739355-amorim.jpg",
+        "imageCredit": "Pelatih AC Milan asal Portugal Ruben Amorim saat pertandingan Serie A Italia antara Juventus dan AC Milan di Stadion Allianz di Turin pada 7 September 2026. (Isabella BONOTTO/AFP)",
+        "source": "Bola.com",
+        "sourceId": "bola",
+        "category": "internasional",
+        "publishedAt": "2026-10-08T14:51:56.000Z"
+      }
+    },
+    {
+      "filename": "/root/.hermes/cache/scratch/lekakick-feeds/extra-3.xml",
+      "sourceId": "bola",
+      "count": 50,
+      "images": 50,
+      "first": {
+        "id": "a4cc11d76018ea13",
+        "slug": "bayern-munchen-siapkan-proposal-untuk-dani-olmo",
+        "title": "Bayern Munchen Siapkan Proposal untuk Dani Olmo",
+        "excerpt": "Bayern Munchen dikabarkan siap menawar €90 juta untuk Dani Olmo pada Januari, namun Barcelona menolak dan sang pemain ingin bertahan hingga 2030.",
+        "url": "https://www.bola.com/spanyol/read/8308845/bayern-munchen-siapkan-proposal-untuk-dani-olmo",
+        "image": "https://cdn1-production-images-kly.akamaized.net/jJU36mNSaaxttHPowUvrCtyj57Q=/673x379/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/9300741/original/083077900_1784373810-olmo.jpg",
+        "imageCredit": "Dani Olmo dari Timnas Spanyol selama pertandingan babak 16 besar Piala Dunia 2026 antara Portugal dan Spanyol di Stadion Dallas pada 7 Juli 2026 di Arlington, Texas. (Molly Darlington/Getty Images melalui AFP)",
+        "source": "Bola.com",
+        "sourceId": "bola",
+        "category": "internasional",
+        "publishedAt": "2026-10-08T15:05:29.000Z"
+      }
+    },
+    {
+      "filename": "/root/.hermes/cache/scratch/lekakick-feeds/extra-0.xml",
+      "sourceId": "tempo",
+      "count": 100,
+      "images": 100,
+      "first": {
+        "id": "c102f0590ecc0c44",
+        "slug": "setelah-juara-asean-bisakah-indonesia-melaju-di-piala-asia",
+        "title": "Setelah Juara ASEAN, Bisakah Indonesia Melaju di Piala Asia",
+        "excerpt": "Indonesia akan kembali menghadapi Thailand dalam penyisihan grup Piala Asia 2027. Apa yang disiapkan John Herdman?",
+        "url": "https://www.tempo.co/sepakbola/setelah-juara-fifa-asean-cup-2026-timnas-indonesia-ke-piala-asia-2027-2299006",
+        "image": "https://images-tm.tempo.co/all/2026/10/05/922470/922470_1200.jpg",
+        "imageCredit": "Foto: Tempo (via RSS)",
+        "source": "Tempo",
+        "sourceId": "tempo",
+        "category": "internasional",
+        "publishedAt": "2026-10-06T09:45:00.000Z"
+      }
+    }
+  ],
+  "live": {
+    "feedCount": 11,
+    "requests": [
+      {
+        "url": "https://feed.bola.com/rss/indonesia",
+        "status": 200,
+        "durationMs": 377,
+        "etag": null,
+        "lastModified": null
+      },
+      {
+        "url": "https://feed.bola.com/rss/dunia",
+        "status": 200,
+        "durationMs": 379,
+        "etag": null,
+        "lastModified": null
+      },
+      {
+        "url": "https://feed.bola.com/rss/spanyol",
+        "status": 200,
+        "durationMs": 380,
+        "etag": null,
+        "lastModified": null
+      },
+      {
+        "url": "https://feed.bola.com/rss/inggris",
+        "status": 200,
+        "durationMs": 387,
+        "etag": null,
+        "lastModified": null
+      },
+      {
+        "url": "https://www.antaranews.com/rss/sepakbola.xml",
+        "status": 200,
+        "durationMs": 572,
+        "etag": "W/\"6ac7fab9-81f3\"",
+        "lastModified": "Thu, 08 Oct 2026 20:19:05 GMT"
+      },
+      {
+        "url": "https://www.antaranews.com/rss/sepakbola-internasional.xml",
+        "status": 200,
+        "durationMs": 517,
+        "etag": "W/\"6ac7fab9-78c4\"",
+        "lastModified": "Thu, 08 Oct 2026 20:19:05 GMT"
+      },
+      {
+        "url": "https://www.antaranews.com/rss/sepakbola-liga-indonesia.xml",
+        "status": 200,
+        "durationMs": 533,
+        "etag": "W/\"6ac7fab9-7ca5\"",
+        "lastModified": "Thu, 08 Oct 2026 20:19:05 GMT"
+      },
+      {
+        "url": "https://www.antaranews.com/rss/sepakbola-liga-inggris-premier.xml",
+        "status": 200,
+        "durationMs": 531,
+        "etag": "W/\"6ac7fab9-6f21\"",
+        "lastModified": "Thu, 08 Oct 2026 20:19:05 GMT"
+      },
+      {
+        "url": "https://pustaka-api.tempo.co/single-brand/rss/free/sepakbola",
+        "status": 200,
+        "durationMs": 621,
+        "etag": null,
+        "lastModified": null
+      },
+      {
+        "url": "https://sport.detik.com/sepakbola/rss",
+        "status": 200,
+        "durationMs": 884,
+        "etag": null,
+        "lastModified": null
+      },
+      {
+        "url": "https://sport.detik.com/sepakbola/liga-indonesia/rss",
+        "status": 200,
+        "durationMs": 1792,
+        "etag": null,
+        "lastModified": null
+      }
+    ],
+    "sourceCounts": [
+      {
+        "id": "antara",
+        "count": 77,
+        "images": 77,
+        "creditedImages": 77
+      },
+      {
+        "id": "detik",
+        "count": 164,
+        "images": 164,
+        "creditedImages": 164
+      },
+      {
+        "id": "bola",
+        "count": 200,
+        "images": 200,
+        "creditedImages": 200
+      },
+      {
+        "id": "tempo",
+        "count": 100,
+        "images": 100,
+        "creditedImages": 100
+      }
+    ],
+    "sources": [
+      {
+        "id": "antara",
+        "name": "ANTARA News",
+        "homepage": "https://www.antaranews.com/sepakbola",
+        "status": "ok",
+        "articleCount": 77,
+        "feedCount": 4,
+        "healthyFeeds": 4,
+        "lastSuccessAt": "2026-10-08T20:19:40.531Z",
+        "lastAttemptAt": "2026-10-08T20:19:38.654Z"
+      },
+      {
+        "id": "detik",
+        "name": "detikSport",
+        "homepage": "https://sport.detik.com/sepakbola",
+        "status": "ok",
+        "articleCount": 164,
+        "feedCount": 2,
+        "healthyFeeds": 2,
+        "lastSuccessAt": "2026-10-08T20:19:40.531Z",
+        "lastAttemptAt": "2026-10-08T20:19:38.654Z"
+      },
+      {
+        "id": "bola",
+        "name": "Bola.com",
+        "homepage": "https://www.bola.com",
+        "status": "ok",
+        "articleCount": 200,
+        "feedCount": 4,
+        "healthyFeeds": 4,
+        "lastSuccessAt": "2026-10-08T20:19:40.531Z",
+        "lastAttemptAt": "2026-10-08T20:19:38.654Z"
+      },
+      {
+        "id": "tempo",
+        "name": "Tempo",
+        "homepage": "https://www.tempo.co/sepakbola",
+        "status": "ok",
+        "articleCount": 100,
+        "feedCount": 1,
+        "healthyFeeds": 1,
+        "lastSuccessAt": "2026-10-08T20:19:40.531Z",
+        "lastAttemptAt": "2026-10-08T20:19:38.654Z"
+      }
+    ],
+    "articleCount": 541,
+    "updatedAt": "2026-10-08T20:19:40.531Z",
+    "degraded": false,
+    "refreshIntervalMs": 300000,
+    "revision": "d0b67705f11ef13885851af31484b223b72aebcc845da25fd04757387a7f73c2",
+    "cacheBytes": 1528639
+  },
+  "offlineResume": {
+    "revisionMatches": true,
+    "articleCount": 541,
+    "degraded": true
+  },
+  "acceptance": {
+    "allFeedsHttp200": true,
+    "allPublishersPresent": true,
+    "allCredited": true,
+    "allExcerptsBounded": true
+  }
+}
