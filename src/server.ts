@@ -9,7 +9,7 @@ const port = Number(process.env.PORT || 4317);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT tidak valid');
 const refreshIntervalMs = resolveRefreshInterval(process.env.REFRESH_INTERVAL_MS);
 const store = new NewsStore({dataDir:process.env.DATA_DIR || path.resolve('data'), refreshIntervalMs});
-await store.init();
+await store.init({waitForRefresh:false});
 const dataDir = process.env.DATA_DIR || path.resolve('data');
 const dailyLimit = Number(process.env.DIGEST_DAILY_LIMIT || 12);
 const digests = new DigestStore({dataDir, apiKey:process.env.DEEPSEEK_API_KEY || undefined, model:process.env.DEEPSEEK_MODEL || 'deepseek-flash', baseUrl:process.env.DEEPSEEK_BASE_URL || undefined,

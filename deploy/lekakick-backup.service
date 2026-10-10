@@ -1,0 +1,7 @@
+[Unit]
+Description=Backup harian data lekakick
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/lekakick-backup
+Nice=10

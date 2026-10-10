@@ -202,6 +202,7 @@ export class DigestStore {
     }));
     const clusters = findClusters(items, { now: this.now(), used: this.usedArticles })
       .filter(cluster => !repeats(cluster) || (cluster.forEach(item => this.usedArticles.add(item.id)), false));
+    if (!clusters.length) console.info('Ringkasan: belum ada topik baru yang diberitakan minimal 2 media');
     let published = 0, attempts = 0;
     for (const cluster of clusters) {
       // Draf yang ditolak tidak dihitung; coba topik berikutnya dalam batas wajar.

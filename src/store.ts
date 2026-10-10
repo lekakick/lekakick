@@ -136,7 +136,11 @@ export class NewsStore {
     });
     this.state = { ...this.state, items: sorted, sources, revision: revisionFor(sorted), updatedAt: latest([...this.cached.values()].map(feed => feed.updatedAt)), degraded: healthy.size !== this.feeds.length };
   }
-  async init(): Promise<void> {
+  /**
+   * Muat cache lalu ambil RSS. Dengan waitForRefresh=false dan cache tersedia, pemeriksaan RSS
+   * berjalan di belakang agar server bisa langsung melayani pembaca setelah restart.
+   */
+  async init(options: { waitForRefresh?: boolean } = {}): Promise<void> {
     await mkdir(this.dataDir, { recursive: true });
     try {
       const filename = path.join(this.dataDir, 'feeds.json');
@@ -162,7 +166,9 @@ export class NewsStore {
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') console.warn('Cache RSS diabaikan');
     }
-    await this.refresh();
+    const refreshing = this.refresh();
+    if ((options.waitForRefresh ?? true) || !this.state.items.length) await refreshing;
+    else refreshing.catch(() => console.error('Pembaruan RSS awal gagal'));
   }
   refresh(): Promise<void> {
     if (!this.pending) this.pending = this.performRefresh().finally(() => { this.pending = null; });
