@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('beranda responsif dan pembaca dapat mencari berita serta membuka sumber', async ({page}) => {
+test('beranda responsif dan pembaca dapat mencari artikel serta menelusuri sumbernya', async ({page}) => {
   const errors:string[]=[];
   page.on('pageerror',error => errors.push(error.message));
   await page.goto('/');
@@ -14,10 +14,17 @@ test('beranda responsif dan pembaca dapat mencari berita serta membuka sumber', 
   await page.setViewportSize({width:1280,height:900});
   await page.getByRole('searchbox').fill('Timnas');
   await page.getByRole('button',{name:'Cari',exact:true}).click();
-  await expect(page).toHaveURL(/q=Timnas/);
+  await expect(page).toHaveURL(/\/artikel\?q=Timnas/);
   await expect(page.locator('.news-card').first()).toBeVisible();
   await page.locator('.news-card h3 a').first().click();
+  await expect(page).toHaveURL(/\/artikel\/[a-f0-9]{16}\//);
   await expect(page.locator('h1')).toBeVisible();
-  await expect(page.getByRole('link',{name:'Baca selengkapnya di ANTARA'})).toHaveAttribute('href', /^https:\/\/www\.antaranews\.com\/berita\//);
+  const sources = page.locator('.digest-source-list a');
+  expect(await sources.count()).toBeGreaterThanOrEqual(2);
+  for (const href of await sources.evaluateAll(links => links.map(link => (link as HTMLAnchorElement).href))) {
+    const url = new URL(href);
+    expect(url.protocol).toBe('https:');
+    expect(['www.antaranews.com','sport.detik.com','www.bola.com','www.tempo.co']).toContain(url.hostname);
+  }
   expect(errors).toEqual([]);
 });

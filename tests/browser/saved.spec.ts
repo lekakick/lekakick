@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('simpan berita, muat ulang, dan hapus dari bacaan saya', async ({page}) => {
-  await page.goto('/berita');
+  await page.goto('/artikel');
   const first = page.locator('.news-card').first();
   const title = await first.locator('h3').innerText();
   await first.locator('[data-save]').click();

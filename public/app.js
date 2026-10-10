@@ -77,7 +77,7 @@ async function loadSaved() {
     grid.replaceChildren(...data.items.map(savedCard));
     const available = new Set(data.items.map(item => item.id));
     const missing = new Set(ids.filter(id => !available.has(id)));
-    status.textContent = `${data.items.length} berita tersimpan.${missing.size ? ` ${missing.size} berita sudah tidak tersedia di arsip RSS.` : ''}`;
+    status.textContent = `${data.items.length} berita tersimpan.${missing.size ? ` ${missing.size} berita sudah tidak tersedia.` : ''}`;
     if (missing.size) {
       const clear = element('button', 'button button-outline', 'Hapus bacaan yang tidak tersedia');
       clear.id = 'clear-unavailable';
@@ -151,3 +151,31 @@ document.querySelectorAll('img').forEach(image => {
     if (!image.src.endsWith('/assets/placeholder.svg?v=2')) image.src = '/assets/placeholder.svg?v=2';
   }, {once:true});
 });
+
+const updateNotice = document.getElementById('news-update');
+if (updateNotice) {
+  let initialRevision = document.body.dataset.newsRevision || '';
+  let checking = false;
+  const checked = document.querySelector('[data-rss-checked]');
+  document.getElementById('show-news-update')?.addEventListener('click', () => window.location.reload());
+  async function checkUpdates() {
+    if (checking || document.visibilityState === 'hidden') return;
+    checking = true;
+    try {
+      const response = await fetch('/api/status', {cache:'no-store', signal:AbortSignal.timeout(10_000)});
+      if (!response.ok) return;
+      const state = await response.json();
+      if (typeof state.revision !== 'string' || !state.revision) return;
+      if (!initialRevision) initialRevision = state.revision;
+      if (state.revision !== initialRevision) updateNotice.hidden = false;
+      const updated = new Date(state.updatedAt);
+      if (checked && state.updatedAt && Number.isFinite(updated.getTime())) {
+        const label = new Intl.DateTimeFormat('id-ID', {timeZone:'Asia/Jakarta',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(updated);
+        checked.textContent = `RSS diperiksa ${label} WIB${state.degraded ? ' · Sebagian sumber terganggu' : ''}`;
+      }
+    } catch { /* Berita yang sedang dibaca tetap tersedia saat jaringan gagal. */ }
+    finally { checking = false; }
+  }
+  setInterval(() => { void checkUpdates(); }, 60_000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') void checkUpdates(); });
+}

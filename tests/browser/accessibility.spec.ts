@@ -22,10 +22,18 @@ test('halaman utama lolos audit aksesibilitas dan aset lokal termuat', async ({p
   await page.screenshot({path:'/root/.hermes/cache/scratch/garisbola-qa/mobile.png',fullPage:true});
   const mobile = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
   expect(mobile.violations).toEqual([]);
-  for (const route of ['/berita','/simpan','/tentang','/privasi']) {
+  for (const route of ['/artikel','/artikel?kategori=timnas','/simpan','/tentang','/privasi']) {
     await page.goto(route);
     const result = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
     expect(result.violations,route).toEqual([]);
   }
+  await page.goto('/artikel');
+  await page.locator('.news-card h3 a').first().click();
+  await page.locator('.report-box summary').click();
+  const article = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
+  expect(article.violations,'detail artikel').toEqual([]);
+  await page.getByLabel('Jenis kesalahan').selectOption('bahasa');
+  await page.getByRole('button',{name:'Kirim laporan'}).click();
+  await expect(page.locator('.report-status')).toBeVisible();
   expect(errors).toEqual([]);
 });

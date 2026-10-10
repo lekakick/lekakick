@@ -2,23 +2,26 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#173d2a">
+  <meta name="theme-color" content="#07130c">
   <title><%= title %></title><meta name="description" content="<%= description %>">
-  <meta property="og:title" content="<%= title %>"><meta property="og:description" content="<%= description %>">
-  <meta property="og:type" content="<%= article ? 'article' : 'website' %>"><meta property="og:locale" content="id_ID"><meta property="og:site_name" content="lekakick">
-  <% if (article && article.image) { %><meta property="og:image" content="<%= article.image %>"><% } %>
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="canonical" href="<%= canonical %>"><meta name="robots" content="<%= robots %>">
+  <meta property="og:url" content="<%= canonical %>"><meta property="og:title" content="<%= title %>"><meta property="og:description" content="<%= description %>">
+  <% const shareImage = locals.ogImage || (article && article.image) || ''; const publishedTime = locals.publishedTime || (article && article.publishedAt) || ''; %><meta property="og:type" content="<%= publishedTime ? 'article' : 'website' %>"><meta property="og:locale" content="id_ID"><meta property="og:site_name" content="lekakick">
+  <meta name="twitter:card" content="summary_large_image">
+  <% if (shareImage) { %><meta property="og:image" content="<%= shareImage %>"><% } else { %><meta property="og:image" content="<%= siteUrl %>/assets/og-default.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="lekakick — Kabar bola, dari semua sisi."><% } %><% if (publishedTime) { %><meta property="article:published_time" content="<%= publishedTime %>"><% } %>
+  <% if (jsonLd) { %><script type="application/ld+json"><%- jsonLd %></script><% } %>
+  <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preload" href="/assets/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/styles.css?v=1"><script src="/assets/app.js?v=3" defer></script>
+  <link rel="stylesheet" href="/assets/styles.css?v=6"><script src="/assets/app.js?v=5" defer></script>
 </head>
-<body>
+<body data-news-revision="<%= newsRevision %>">
 <a class="skip-link" href="#konten">Langsung ke konten</a>
 <div class="topbar"><div class="container topbar-inner"><span><span class="status-dot"></span> SEPAK BOLA. TANPA BATAS.</span><span class="topbar-date"><%= today %></span><a href="/tentang">Tentang lekakick <span aria-hidden="true">↗</span></a></div></div>
 <header class="site-header">
   <div class="container masthead">
     <a class="brand" href="/" aria-label="lekakick beranda"><img src="/assets/favicon.svg" width="42" height="42" alt=""><span>lekakick<span class="brand-period">.</span></span></a>
     <span class="brand-caption">Kabar bola,<br>dari semua sisi.</span>
-    <form class="search-form" action="/berita" method="get" role="search">
+    <form class="search-form" action="/artikel" method="get" role="search">
       <label class="sr-only" for="cari">Cari berita</label><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
       <input id="cari" type="search" name="q" value="<%= q %>" placeholder="Cari klub, pemain, atau berita…" maxlength="100"><button type="submit" aria-label="Cari">↵</button>
     </form>
@@ -26,9 +29,10 @@
   </div>
   <div class="nav-wrap"><nav class="container nav" aria-label="Navigasi utama">
     <a href="/" class="<%= section === 'beranda' ? 'active' : '' %>" <%- section === 'beranda' ? 'aria-current="page"' : '' %>>Beranda</a>
-    <a href="/berita" class="<%= section === 'berita' && category === 'semua' ? 'active' : '' %>">Berita Terbaru</a>
-    <% categories.filter(c => c.id !== 'semua').forEach(c => { %><a href="/berita?kategori=<%= c.id %>" class="<%= section === 'berita' && category === c.id ? 'active' : '' %>"><%= c.name %></a><% }); %>
-    <a class="nav-last" href="/berita?q=Indonesia"><span class="mini-flag" aria-hidden="true"></span> Rumahnya bola Indonesia <span aria-hidden="true">↗</span></a>
+    <a href="/artikel" class="<%= section === 'artikel' && category === 'semua' ? 'active' : '' %>" <%- section === 'artikel' && category === 'semua' ? 'aria-current="page"' : '' %>>Semua Artikel</a>
+    <% categories.filter(c => c.id !== 'semua').forEach(c => { %><a href="/artikel?kategori=<%= c.id %>" class="<%= section === 'artikel' && category === c.id ? 'active' : '' %>"><%= c.name %></a><% }); %>
+    <a class="nav-last" href="/artikel?q=Indonesia"><span class="mini-flag" aria-hidden="true"></span> Rumahnya bola Indonesia <span aria-hidden="true">↗</span></a>
   </nav></div>
 </header>
-<% if (state.degraded) { %><div class="container feed-notice" role="status">Sebagian sumber belum dapat diperbarui. <%= state.items.length ? 'Menampilkan berita yang terakhir tersimpan.' : 'Berita akan muncul setelah sumber kembali tersedia.' %></div><% } %>
+
+<% if(section === 'beranda' || (section === 'artikel' && !locals.digest)) { %><%- include('updates') %><% } %>

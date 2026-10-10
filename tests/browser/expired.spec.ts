@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const storageKey = 'garisbola.saved.v1';
 
 test('hapus hanya bookmark yang dipastikan tidak tersedia dan bebaskan kuota simpan', async ({page, request}) => {
-  await page.goto('/berita');
+  await page.goto('/artikel');
   const saveButtons = page.locator('.news-card [data-save]');
   await expect(saveButtons.nth(1)).toBeVisible();
   const availableId = await saveButtons.nth(0).getAttribute('data-save');
@@ -28,7 +28,7 @@ test('hapus hanya bookmark yang dipastikan tidak tersedia dan bebaskan kuota sim
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key) || '[]'), storageKey)).toEqual([]);
   await expect(clear).toHaveCount(0);
 
-  await page.goto('/berita');
+  await page.goto('/artikel');
   const save = page.locator(`[data-save="${availableId}"]`);
   await save.click();
   await expect(save).toHaveAttribute('aria-pressed', 'true');
