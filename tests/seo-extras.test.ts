@@ -33,6 +33,10 @@ test('favicon, gambar bagikan bawaan, breadcrumb, dan judul halaman ramah mesin 
     assert.match(longHtml, new RegExp(`<title>${long.title}</title>`), 'judul panjang tanpa akhiran merek');
     const listing = await (await fetch(`${base}/artikel?kategori=timnas`)).text();
     assert.match(listing, /"BreadcrumbList"/);
+    const cache = async (url: string) => (await fetch(base + url)).headers.get('cache-control');
+    assert.match(await cache('/assets/styles.css?v=6') ?? '', /max-age=31536000, immutable/, 'aset berversi di-cache setahun');
+    assert.match(await cache('/assets/fonts/dm-sans-latin-400-normal.woff2') ?? '', /immutable/);
+    assert.equal(await cache('/assets/favicon.svg'), 'public, max-age=86400', 'aset tanpa versi tetap 1 hari');
   } finally { await new Promise<void>(r => server.close(() => r())); }
 });
 

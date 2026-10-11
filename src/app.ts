@@ -45,7 +45,11 @@ export function createApp(store: {snapshot(): Snapshot}, digests: {list(): Diges
   for (const file of ['favicon.ico', 'apple-touch-icon.png']) {
     app.get(`/${file}`, (_req,res) => res.sendFile(path.join(root, 'public', file), {maxAge:'7d'}));
   }
-  app.use('/assets', express.static(path.join(root, 'public'), {maxAge:'1d', dotfiles:'deny', index:false}));
+  // Font dan aset ber-?v= tidak pernah berubah di URL yang sama, jadi boleh di-cache setahun.
+  app.use('/assets', express.static(path.join(root, 'public'), {maxAge:'1d', dotfiles:'deny', index:false, setHeaders: (res, file) => {
+    const req = (res as express.Response).req;
+    if (req.query.v || file.includes(`${path.sep}fonts${path.sep}`)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }}));
   app.get(['/healthz', '/api/status'], (_req,res) => {
     const state = store.snapshot();
     res.set('Cache-Control','no-store').json({
