@@ -30,7 +30,7 @@ test('tautan rangkuman untuk judul emoji dan CJK memakai ID sebagai slug dan men
   await new Promise<void>(resolve => server.once('listening', resolve));
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   try {
-    const response = await fetch(`${base}/api/berita?ids=${digests.map(item => item.id).join(',')}`);
+    const response = await fetch(`${base}/api/artikel.json`);
     assert.equal(response.status, 200);
     const data = await response.json();
     assert.equal(data.items.length, titles.length);

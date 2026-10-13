@@ -14,7 +14,7 @@ test('beranda responsif dan pembaca dapat mencari artikel serta menelusuri sumbe
   await page.setViewportSize({width:1280,height:900});
   await page.getByRole('searchbox').fill('Timnas');
   await page.getByRole('button',{name:'Cari',exact:true}).click();
-  await expect(page).toHaveURL(/\/artikel\?q=Timnas/);
+  await expect(page).toHaveURL(/\/cari\?q=Timnas/);
   await expect(page.locator('.news-card').first()).toBeVisible();
   await page.locator('.news-card h3 a').first().click();
   await expect(page).toHaveURL(/\/artikel\/[a-f0-9]{16}\//);

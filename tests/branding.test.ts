@@ -13,7 +13,7 @@ test('seluruh halaman dan ilustrasi memakai merek lekakick secara konsisten', as
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   try {
     const digest = fixtureDigests[0]!;
-    for (const route of ['/', '/artikel', '/artikel?q=Timnas', '/simpan', '/tentang', '/privasi', `/artikel/${digest.id}/${digest.slug}`, '/tidak-ada']) {
+    for (const route of ['/', '/artikel', '/cari?q=Timnas', '/simpan', '/tentang', '/privasi', `/artikel/${digest.id}/${digest.slug}`, '/tidak-ada']) {
       const response = await fetch(base+route);
       const html = await response.text();
       assert.equal(response.status, route === '/tidak-ada' ? 404 : 200,route);

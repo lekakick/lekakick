@@ -12,7 +12,7 @@
   <% if (jsonLd) { %><script type="application/ld+json"><%- jsonLd %></script><% } %>
   <link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"><link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preload" href="/assets/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/styles.css?v=6"><script src="/assets/app.js?v=5" defer></script>
+  <link rel="stylesheet" href="/assets/styles.css?v=6"><script src="/assets/app.js?v=6" defer></script>
 </head>
 <body data-news-revision="<%= newsRevision %>">
 <a class="skip-link" href="#konten">Langsung ke konten</a>
@@ -21,17 +21,17 @@
   <div class="container masthead">
     <a class="brand" href="/" aria-label="lekakick beranda"><img src="/assets/favicon.svg" width="42" height="42" alt=""><span>lekakick<span class="brand-period">.</span></span></a>
     <span class="brand-caption">Kabar bola,<br>dari semua sisi.</span>
-    <form class="search-form" action="/artikel" method="get" role="search">
+    <form class="search-form" action="/cari" method="get" role="search">
       <label class="sr-only" for="cari">Cari berita</label><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
-      <input id="cari" type="search" name="q" value="<%= q %>" placeholder="Cari klub, pemain, atau berita…" maxlength="100"><button type="submit" aria-label="Cari">↵</button>
+      <input id="cari" type="search" name="q" placeholder="Cari klub, pemain, atau berita…" maxlength="100"><button type="submit" aria-label="Cari">↵</button>
     </form>
     <a class="saved-link" href="/simpan" aria-label="Bacaan saya"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg><span>Bacaan saya</span></a>
   </div>
   <div class="nav-wrap"><nav class="container nav" aria-label="Navigasi utama">
     <a href="/" class="<%= section === 'beranda' ? 'active' : '' %>" <%- section === 'beranda' ? 'aria-current="page"' : '' %>>Beranda</a>
     <a href="/artikel" class="<%= section === 'artikel' && category === 'semua' ? 'active' : '' %>" <%- section === 'artikel' && category === 'semua' ? 'aria-current="page"' : '' %>>Semua Artikel</a>
-    <% categories.filter(c => c.id !== 'semua').forEach(c => { %><a href="/artikel?kategori=<%= c.id %>" class="<%= section === 'artikel' && category === c.id ? 'active' : '' %>"><%= c.name %></a><% }); %>
-    <a class="nav-last" href="/artikel?q=Indonesia"><span class="mini-flag" aria-hidden="true"></span> Rumahnya bola Indonesia <span aria-hidden="true">↗</span></a>
+    <% categories.filter(c => c.id !== 'semua').forEach(c => { %><a href="<%= listingPath(c.id) %>" class="<%= section === 'artikel' && category === c.id ? 'active' : '' %>"><%= c.name %></a><% }); %>
+    <a class="nav-last" href="/cari?q=Indonesia"><span class="mini-flag" aria-hidden="true"></span> Rumahnya bola Indonesia <span aria-hidden="true">↗</span></a>
   </nav></div>
 </header>
 

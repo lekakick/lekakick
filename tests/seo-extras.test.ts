@@ -31,7 +31,7 @@ test('favicon, gambar bagikan bawaan, breadcrumb, dan judul halaman ramah mesin 
     assert.match(detail, new RegExp(`<title>${digest.title} — lekakick</title>`));
     const longHtml = await (await fetch(`${base}/artikel/${long.id}/${long.slug}`)).text();
     assert.match(longHtml, new RegExp(`<title>${long.title}</title>`), 'judul panjang tanpa akhiran merek');
-    const listing = await (await fetch(`${base}/artikel?kategori=timnas`)).text();
+    const listing = await (await fetch(`${base}/artikel/kategori/timnas`)).text();
     assert.match(listing, /"BreadcrumbList"/);
     const cache = async (url: string) => (await fetch(base + url)).headers.get('cache-control');
     assert.match(await cache('/assets/styles.css?v=6') ?? '', /max-age=31536000, immutable/, 'aset berversi di-cache setahun');
@@ -46,8 +46,8 @@ test('laporan kesalahan tersimpan, bot dan pengirim berulang dibatasi', async ()
   const server = app.listen(0, '127.0.0.1'); await new Promise<void>(r => server.once('listening', r));
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   const digest = fixtureDigests[0]!;
-  const send = (fields: Record<string, string>) => fetch(`${base}/artikel/${digest.id}/lapor`, {method:'POST', redirect:'manual',
-    headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams(fields)});
+  const send = (fields: Record<string, string>, id = digest.id) => fetch(`${base}/api/lapor`, {method:'POST', redirect:'manual',
+    headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:new URLSearchParams({artikel:id, ...fields})});
   try {
     const ok = await send({jenis:'fakta', catatan:'Skor   seharusnya 2-1'});
     assert.equal(ok.status, 303);
@@ -59,9 +59,9 @@ test('laporan kesalahan tersimpan, bot dan pengirim berulang dibatasi', async ()
     assert.deepEqual([saved[0].digestId, saved[0].kind, saved[0].note], [digest.id, 'fakta', 'Skor seharusnya 2-1']);
     for (let i = 0; i < 4; i++) await send({jenis:'bahasa'});
     assert.equal((await send({jenis:'bahasa'})).headers.get('location')?.includes('lapor=batas'), true, 'maks 5 laporan per jam');
-    const page = await (await fetch(`${base}/artikel/${digest.id}/${digest.slug}?lapor=terkirim`)).text();
-    assert.ok(page.includes('laporan Anda sudah kami terima') && page.includes('id="lapor" open'));
-    assert.equal((await fetch(`${base}/artikel/0000000000000000/lapor`, {method:'POST'})).status, 404);
+    const page = await (await fetch(`${base}/artikel/${digest.id}/${digest.slug}`)).text();
+    assert.ok(page.includes('data-report-status="terkirim" hidden') && page.includes('name="artikel" value="' + digest.id + '"'), 'pesan status ditampilkan app.js');
+    assert.equal((await send({jenis:'fakta'}, '0000000000000000')).status, 404);
   } finally {
     await new Promise<void>(r => server.close(() => r()));
     await rm(dataDir, {recursive:true, force:true});

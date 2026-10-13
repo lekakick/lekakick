@@ -46,25 +46,27 @@ Perintah menunggu foreground hingga sekitar 6 menit dan menulis bukti `qa/automa
 ## Branding
 Nama publik resmi: `lekakick` (huruf kecil). Nama layanan, direktori deployment/cache, dan key localStorage `garisbola.saved.v1` sengaja dipertahankan sebagai identifier internal agar deployment dan bookmark pembaca tidak terputus saat perubahan merek.
 
-## Production
-Nginx HTTP :80 -> Node 127.0.0.1:4317. Layanan systemd DynamicUser, ProtectHome, read-only application, memory/CPU limits, restart-on-failure, enabled at boot.
-Cache: `/var/lib/garisbola/feeds.json`. Hanya direktori ini yang dapat ditulis aplikasi.
-Config: `/etc/systemd/system/garisbola.service` dan `/etc/nginx/sites-available/garisbola`.
+## Production (Cloudflare Pages + GitHub Actions)
+Situs berupa berkas statis di Cloudflare Pages, dibangun ulang oleh `.github/workflows/publish.yml` tiap 30 menit:
 
-    systemctl status garisbola nginx
-    journalctl -u garisbola -n 50 --no-pager
-    curl http://127.0.0.1:4317/healthz
+1. `node dist/publish.js out` mengambil RSS (arsip `data/feeds.json` disimpan di cache Actions), menulis paling banyak satu rangkuman AI, lalu mengekspor seluruh halaman ke `out/` (`src/static.ts`).
+2. `data/digests.json` (arsip artikel) di-commit ke repo bila berubah — riwayat git sekaligus menjadi backup.
+3. Bila ada artikel baru (atau workflow dijalankan manual/push ke main), `out/` diunggah dengan `wrangler pages deploy`.
 
-Untuk pembaruan aplikasi setelah tes lolos:
+Yang tetap butuh kode server ada di `functions/` (Pages Functions, lihat `_routes.json`): pengalihan alamat lama `/artikel?kategori=…`, 410 untuk `/berita/*`, dan formulir laporan `/api/lapor`. Laporan pembaca tersimpan di KV namespace dengan binding `LAPORAN` (Cloudflare → Workers & Pages → KV).
+
+Pengaturan di GitHub → Settings → Secrets and variables → Actions:
+- Secrets: `DEEPSEEK_API_KEY`, `CLOUDFLARE_API_TOKEN` (izin *Cloudflare Pages: Edit*), `CLOUDFLARE_ACCOUNT_ID`.
+- Variables (opsional): `DEEPSEEK_MODEL` (bawaan `deepseek-v4-pro`), `DIGEST_DAILY_LIMIT` (bawaan 12).
+
+Uji lokal persis seperti di Cloudflare:
 
     npm run build
-    cp -a dist views public package.json package-lock.json /opt/garisbola/
-    npm ci --omit=dev --ignore-scripts --prefix /opt/garisbola
-    systemctl restart garisbola
-    curl --retry 10 --retry-connrefused --retry-delay 2 --fail http://127.0.0.1:4317/healthz
+    DATA_DIR=data node dist/publish.js out --tanpa-ai
+    npx wrangler pages dev out --kv LAPORAN
 
-Config deploy tersimpan di `deploy/`; validasi `nginx -t` sebelum reload. Layanan bot lain tidak perlu disentuh.
-Domain belum diberikan; HTTPS belum dikonfigurasi. Setelah domain mengarah ke IP VPS, ubah server_name, pasang sertifikat tepercaya/auto-renew, redirect HTTP ke HTTPS, lalu aktifkan HSTS hanya setelah TLS tervalidasi.
+Menghapus artikel: hapus entrinya dari `data/digests.json`, commit ke main; workflow akan menerbitkan ulang.
+`src/server.ts` + `deploy/` (Node + Nginx di VPS) masih bisa dipakai untuk server biasa.
 
 ## Batasan konten
 Ini aggregator RSS, bukan penerbit artikel penuh. Berita/foto tetap milik sumber. Penggunaan komersial harus mengikuti lisensi penerbit. Kategori berbasis kata kunci; tidak selalu sempurna. Arsip dibatasi 1200 artikel (mempertahankan hingga 100 artikel nyata per penerbit, lalu mengisi dengan berita terbaru), sehingga bookmark lama dapat kedaluwarsa. Waktu terbit mengikuti RSS penerbit; tidak seluruh isi website penerbit tersedia di RSS. Tidak melakukan scraping artikel lengkap atau melewati paywall.

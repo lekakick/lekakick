@@ -1,6 +1,6 @@
 <article class="news-card digest-card" data-article-id="<%= item.id %>">
   <a class="card-image" href="<%= digestPath(item) %>" tabindex="-1" aria-hidden="true"><img src="<%= item.image || '/assets/placeholder.svg?v=2' %>" alt="" loading="lazy" width="800" height="533"><span class="digest-badge">RANGKUMAN · <%= item.sources.length %> MEDIA</span><span class="image-arrow" aria-hidden="true">↗</span></a>
-  <div class="card-content"><div class="article-meta"><a class="category-label" href="/artikel?kategori=<%= item.category %>"><%= categoryName(item.category) %></a><span class="meta-dot">·</span><time datetime="<%= item.publishedAt %>"><%= date(item.publishedAt) %></time></div>
+  <div class="card-content"><div class="article-meta"><a class="category-label" href="<%= listingPath(item.category) %>"><%= categoryName(item.category) %></a><span class="meta-dot">·</span><time datetime="<%= item.publishedAt %>"><%= date(item.publishedAt) %></time></div>
   <h3><a href="<%= digestPath(item) %>"><%= item.title %></a></h3><p class="card-excerpt"><%= item.dek %></p>
   <div class="card-bottom"><span><span class="source-dot digest-dot" aria-hidden="true"></span>Redaksi lekakick</span><button class="bookmark icon-button" data-save="<%= item.id %>" aria-label="Simpan artikel: <%= item.title %>" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg></button></div></div>
 </article>

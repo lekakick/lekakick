@@ -8,7 +8,7 @@ test('halaman ringkasan RSS lama dihapus dan status sumber tetap transparan',asy
  expect(old.status()).toBe(410);
  expect(await old.text()).toContain('noindex');
  await page.goto('/berita?kategori=timnas&sumber=detik');
- await expect(page).toHaveURL(/\/artikel\?kategori=timnas$/);
+ await expect(page).toHaveURL(/\/artikel\/kategori\/timnas$/);
  await expect(page.locator('.news-card').first()).toBeVisible();
  for(const label of await page.locator('.news-card .category-label').allTextContents())expect(label.trim()).toBe('Timnas');
  for(const width of [1440,768,390,320]){

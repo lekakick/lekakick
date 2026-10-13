@@ -30,7 +30,16 @@ function element(tag, className, text) {
   if (text) node.textContent = text;
   return node;
 }
-function savedCard(item) {
+let indexRequest;
+// Indeks semua artikel (statis); dipakai "Bacaan saya" dan pencarian.
+function loadIndex() {
+  indexRequest ??= fetch('/api/artikel.json', {cache:'no-cache'}).then(response => {
+    if (!response.ok) throw new Error('Gagal memuat indeks');
+    return response.json();
+  }).catch(error => { indexRequest = undefined; throw error; });
+  return indexRequest;
+}
+function savedCard(item, removable = true) {
   const card = element('article', 'news-card');
   const imageLink = element('a', 'card-image');
   imageLink.href = item.path;
@@ -47,11 +56,14 @@ function savedCard(item) {
   const heading = element('h3');
   const link = element('a','',item.title); link.href = item.path; heading.append(link);
   const bottom = element('div','card-bottom');
-  const remove = element('button','button button-outline','Hapus');
-  remove.dataset.save = item.id;
-  remove.setAttribute('aria-label', `Hapus dari bacaan: ${item.title}`);
-  remove.setAttribute('aria-pressed','true');
-  bottom.append(element('span','',item.source),remove);
+  bottom.append(element('span','','Redaksi lekakick'));
+  if (removable) {
+    const remove = element('button','button button-outline','Hapus');
+    remove.dataset.save = item.id;
+    remove.setAttribute('aria-label', `Hapus dari bacaan: ${item.title}`);
+    remove.setAttribute('aria-pressed','true');
+    bottom.append(remove);
+  }
   content.append(meta,heading,element('p','card-excerpt',item.excerpt),bottom);
   card.append(imageLink,content);
   return card;
@@ -70,11 +82,10 @@ async function loadSaved() {
     return;
   }
   try {
-    const response = await fetch(`/api/berita?ids=${encodeURIComponent(ids.join(','))}`);
-    if (!response.ok) throw new Error('Gagal memuat bacaan');
-    const data = await response.json();
+    const index = await loadIndex();
     if (request !== savedRequest) return;
-    grid.replaceChildren(...data.items.map(savedCard));
+    const data = {items:index.items.filter(item => ids.includes(item.id))};
+    grid.replaceChildren(...data.items.map(item => savedCard(item)));
     const available = new Set(data.items.map(item => item.id));
     const missing = new Set(ids.filter(id => !available.has(id)));
     status.textContent = `${data.items.length} berita tersimpan.${missing.size ? ` ${missing.size} berita sudah tidak tersedia.` : ''}`;
@@ -152,6 +163,31 @@ document.querySelectorAll('img').forEach(image => {
   }, {once:true});
 });
 
+async function runSearch() {
+  const grid = document.getElementById('search-grid');
+  const status = document.getElementById('search-status');
+  if (!grid || !status) return;
+  const q = (new URLSearchParams(window.location.search).get('q') || '').trim().slice(0, 100);
+  const input = document.getElementById('cari');
+  if (input) input.value = q;
+  if (q) document.title = `Hasil pencarian: ${q} — lekakick`;
+  try {
+    const index = await loadIndex();
+    const needle = q.toLocaleLowerCase('id');
+    const found = index.items.filter(item => !needle || `${item.title} ${item.excerpt} ${item.categoryLabel}`.toLocaleLowerCase('id').includes(needle));
+    grid.replaceChildren(...found.slice(0, 60).map(item => savedCard(item, false)));
+    status.textContent = q ? `${found.length} artikel untuk “${q}”` : `${found.length} artikel. Ketik kata kunci di kolom pencarian.`;
+    document.getElementById('search-empty').hidden = found.length > 0;
+  } catch { status.textContent = 'Pencarian belum dapat dimuat. Periksa koneksi lalu muat ulang halaman.'; }
+}
+void runSearch();
+const reportStatus = new URLSearchParams(window.location.search).get('lapor');
+const reportMessage = reportStatus && document.querySelector(`[data-report-status="${CSS.escape(reportStatus)}"]`);
+if (reportMessage) { reportMessage.hidden = false; document.getElementById('lapor')?.setAttribute('open', ''); }
+// Halaman statis bisa dibuat kemarin; tanggal di topbar selalu mengikuti hari ini.
+const topbarDate = document.querySelector('.topbar-date');
+if (topbarDate) topbarDate.textContent = new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date());
+
 const updateNotice = document.getElementById('news-update');
 if (updateNotice) {
   let initialRevision = document.body.dataset.newsRevision || '';
@@ -162,7 +198,7 @@ if (updateNotice) {
     if (checking || document.visibilityState === 'hidden') return;
     checking = true;
     try {
-      const response = await fetch('/api/status', {cache:'no-store', signal:AbortSignal.timeout(10_000)});
+      const response = await fetch('/api/status.json', {cache:'no-store', signal:AbortSignal.timeout(10_000)});
       if (!response.ok) return;
       const state = await response.json();
       if (typeof state.revision !== 'string' || !state.revision) return;

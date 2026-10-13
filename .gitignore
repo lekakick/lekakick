@@ -1,6 +1,9 @@
 node_modules/
 dist/
-data/
+data/*
+!data/digests.json
+out/
+.wrangler/
 .env
 playwright-report/
 test-results/

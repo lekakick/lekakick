@@ -12,9 +12,10 @@ test('hapus hanya bookmark yang dipastikan tidak tersedia dan bebaskan kuota sim
   expect(laterId).toMatch(/^[a-f0-9]{16}$/);
 
   const expiredIds = Array.from({length: 100}, (_, index) => index.toString(16).padStart(16, '0'));
-  const response = await request.get(`/api/berita?ids=${expiredIds.join(',')}`);
+  const response = await request.get('/api/artikel.json');
   expect(response.ok()).toBeTruthy();
-  expect(await response.json()).toEqual({items: []});
+  const {items} = await response.json() as {items: {id: string}[]};
+  expect(items.some(item => expiredIds.includes(item.id))).toBeFalsy();
 
   await page.evaluate(({key, ids}) => localStorage.setItem(key, JSON.stringify(ids)), {key: storageKey, ids: expiredIds});
   await page.goto('/simpan');

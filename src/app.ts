@@ -20,10 +20,24 @@ const pageTitle = (title: string) => title.length <= 50 ? `${title} — lekakick
 const ORGANIZATION = {'@type':'Organization', name:'lekakick', url:`${SITE_URL}/`, logo:{'@type':'ImageObject', url:`${SITE_URL}/assets/icon-512.png`, width:512, height:512}};
 const categoryName = (id: string) => CATEGORIES.find(c => c.id === id)?.name ?? 'Sepak Bola';
 const digestPath = (item: Digest) => `/artikel/${item.id}/${item.slug}`;
+// Semua halaman memakai path tanpa query agar dapat diekspor menjadi berkas statis.
+export const listingPath = (category = 'semua', page = 1) =>
+  `/artikel${category !== 'semua' ? `/kategori/${category}` : ''}${page > 1 ? `/halaman/${page}` : ''}`;
+export const PAGE_SIZE = 12;
 const date = (value: string, full = false) => new Intl.DateTimeFormat('id-ID', {
   timeZone:'Asia/Jakarta', day:'numeric', month: full ? 'long' : 'short', year:'numeric',
   ...(full ? {hour:'2-digit',minute:'2-digit'} as const : {}),
 }).format(new Date(value)) + (full ? ' WIB' : '');
+
+/** Tujuan 301 untuk alamat lama `/artikel?kategori=…&halaman=…&q=…`; undefined bila tidak ada query yang dikenal. */
+export function legacyListingTarget(query: Record<string, unknown>): string | undefined {
+  const q = typeof query.q === 'string' ? query.q.trim().slice(0, 100) : '';
+  if (q) return `/cari?${new URLSearchParams({q})}`;
+  const category = typeof query.kategori === 'string' && CATEGORIES.some(c => c.id === query.kategori) ? query.kategori : 'semua';
+  const page = typeof query.halaman === 'string' && /^[1-9]\d{0,8}$/.test(query.halaman) ? Number(query.halaman) : 1;
+  if (query.kategori === undefined && query.halaman === undefined) return undefined;
+  return listingPath(category, page);
+}
 
 export function createApp(store: {snapshot(): Snapshot}, digests: {list(): Digest[]} = {list: () => []}, reports?: Pick<ReportLog, 'add'>) {
   const app = express();
@@ -50,7 +64,7 @@ export function createApp(store: {snapshot(): Snapshot}, digests: {list(): Diges
     const req = (res as express.Response).req;
     if (req.query.v || file.includes(`${path.sep}fonts${path.sep}`)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   }}));
-  app.get(['/healthz', '/api/status'], (_req,res) => {
+  app.get(['/healthz', '/api/status.json'], (_req,res) => {
     const state = store.snapshot();
     res.set('Cache-Control','no-store').json({
       status:state.items.length ? 'ok':'waiting', articles:state.items.length,
@@ -69,22 +83,18 @@ export function createApp(store: {snapshot(): Snapshot}, digests: {list(): Diges
       refreshMinutes:(state.refreshIntervalMs ?? REFRESH_INTERVAL_MS) / 60_000,
       title:'lekakick — Kabar bola, dari semua sisi.',
       description:'Kurasi berita sepak bola Indonesia dan dunia. Ikuti kabar Timnas, Liga Indonesia, hingga bursa transfer dengan sumber yang jelas.',
-      section:'beranda', q:'', category:'semua', article:null,
+      section:'beranda', category:'semua', article:null, listingPath,
       today: new Intl.DateTimeFormat('id-ID',{timeZone:'Asia/Jakarta',weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date()),
       year:new Date().getFullYear(),
     };
     res.set('Cache-Control','public, max-age=30');
     next();
   });
-  const searchDigests = (params: {q?: unknown; category?: unknown; page?: unknown}) => {
-    const category = CATEGORIES.some(c => c.id === params.category) ? String(params.category) : 'semua';
-    const q = typeof params.q === 'string' ? params.q.trim().slice(0, 100) : '';
-    const needle = q.toLocaleLowerCase('id');
-    const filtered = digests.list().filter(item => (category === 'semua' || item.category === category)
-      && (!needle || `${item.title} ${item.dek} ${item.paragraphs.join(' ')}`.toLocaleLowerCase('id').includes(needle)));
-    const pages = Math.max(1, Math.ceil(filtered.length / 12));
-    const page = typeof params.page === 'string' && /^\d{1,9}$/.test(params.page) ? Math.min(pages, Math.max(1, Number(params.page))) : 1;
-    return {items:filtered.slice((page-1)*12, page*12), total:filtered.length, page, pages, category, q};
+  const listing = (category: string, pageParam?: string) => {
+    const filtered = digests.list().filter(item => category === 'semua' || item.category === category);
+    const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const page = pageParam === undefined ? 1 : /^[1-9]\d{0,8}$/.test(pageParam) ? Number(pageParam) : NaN;
+    return {items:filtered.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE), total:filtered.length, page, pages, category};
   };
   app.get('/', (_req,res) => {
     const all = digests.list();
@@ -92,50 +102,57 @@ export function createApp(store: {snapshot(): Snapshot}, digests: {list(): Diges
     const rest = all.filter(item => item.id !== lead?.id);
     res.render('home', {lead, side:rest.slice(0,2), latest:rest.slice(2,8), spotlight:all.slice(0,5),
       jsonLd:jsonLd({'@context':'https://schema.org', '@type':'WebSite', name:'lekakick', url:`${SITE_URL}/`, inLanguage:'id-ID', publisher:ORGANIZATION,
-        potentialAction:{'@type':'SearchAction', target:`${SITE_URL}/artikel?q={search_term_string}`, 'query-input':'required name=search_term_string'}})});
+        potentialAction:{'@type':'SearchAction', target:`${SITE_URL}/cari?q={search_term_string}`, 'query-input':'required name=search_term_string'}})});
   });
-  app.get('/artikel', (req,res) => {
-    const result = searchDigests({q:req.query.q, category:req.query.kategori, page:req.query.halaman});
-    const canonicalQuery = new URLSearchParams({...(result.category !== 'semua' ? {kategori:result.category} : {}), ...(result.page > 1 ? {halaman:String(result.page)} : {})}).toString();
-    const listingName = result.category === 'semua' ? 'Semua Artikel' : categoryName(result.category);
+  // Alamat lama berbasis query dialihkan ke path statis (di Cloudflare ditangani functions/artikel/index.js).
+  app.get('/artikel', (req,res,next) => {
+    const target = legacyListingTarget(req.query);
+    if (target) return res.redirect(301, target);
+    renderListing(res, next, 'semua');
+  });
+  app.get('/artikel/halaman/:page', (req,res,next) => renderListing(res, next, 'semua', req.params.page));
+  app.get('/artikel/kategori/:category', (req,res,next) => renderListing(res, next, req.params.category));
+  app.get('/artikel/kategori/:category/halaman/:page', (req,res,next) => renderListing(res, next, req.params.category, req.params.page));
+  function renderListing(res: express.Response, next: express.NextFunction, category: string, pageParam?: string) {
+    if (!CATEGORIES.some(c => c.id === category && c.id !== 'semua') && category !== 'semua') return next();
+    const result = listing(category, pageParam);
+    if (pageParam === '1') return res.redirect(301, listingPath(category));
+    if (!Number.isInteger(result.page) || result.page > result.pages) return next();
+    const listingName = category === 'semua' ? 'Semua Artikel' : categoryName(category);
     res.render('digests', {...result, section:'artikel',
-      jsonLd:result.q ? '' : jsonLd({'@context':'https://schema.org', ...breadcrumb([['Beranda','/'],['Artikel','/artikel'],
-        ...(result.category !== 'semua' ? [[listingName, `/artikel?kategori=${result.category}`] as [string, string]] : [])])}),
-      canonical:`${SITE_URL}/artikel${canonicalQuery ? `?${canonicalQuery}` : ''}`,
-      robots:result.q || !result.items.length ? 'noindex,follow' : 'index,follow,max-image-preview:large',
-      title:`${result.q ? `Hasil pencarian: ${result.q}` : result.category === 'semua' ? 'Semua Artikel' : categoryName(result.category)} — lekakick`,
+      jsonLd:jsonLd({'@context':'https://schema.org', ...breadcrumb([['Beranda','/'],['Artikel','/artikel'],
+        ...(category !== 'semua' ? [[listingName, listingPath(category)] as [string, string]] : [])])}),
+      canonical:absolute(listingPath(category, result.page)),
+      robots:!result.items.length ? 'noindex,follow' : 'index,follow,max-image-preview:large',
+      title:`${listingName}${result.page > 1 ? ` (halaman ${result.page})` : ''} — lekakick`,
       description:'Rangkuman berita sepak bola Indonesia dan dunia dari berbagai media, disusun lekakick dengan sumber yang selalu dicantumkan.',
-      pageLink:(page:number) => `/artikel?${new URLSearchParams({...(result.category !== 'semua' ? {kategori:result.category} : {}), ...(result.q ? {q:result.q} : {}), halaman:String(page)})}`,
+      pageLink:(page:number) => listingPath(category, page),
     });
-  });
+  }
+  app.get('/cari', (_req,res) => res.render('search', {robots:'noindex,follow', section:'cari', title:'Cari artikel — lekakick', canonical:absolute('/cari')}));
   // Halaman ringkasan RSS lama sudah dihapus: daftar dialihkan, detail dijawab 410 agar mesin pencari cepat membuangnya.
-  app.get('/berita', (req,res) => {
-    const params = new URLSearchParams();
-    if (typeof req.query.kategori === 'string' && CATEGORIES.some(c => c.id === req.query.kategori && c.id !== 'semua')) params.set('kategori', req.query.kategori);
-    if (typeof req.query.q === 'string' && req.query.q.trim()) params.set('q', req.query.q.trim().slice(0, 100));
-    res.redirect(301, `/artikel${params.size ? `?${params}` : ''}`);
-  });
+  app.get('/berita', (req,res) => res.redirect(301, legacyListingTarget(req.query) ?? '/artikel'));
   app.get('/berita/:id/:slug', (_req,res) => res.status(410).render('not-found', {robots:'noindex,follow', gone:true}));
   app.get('/artikel/:id/:slug', (req,res) => {
     const digest = digests.list().find(item => item.id === req.params.id);
     if (!digest) return res.status(404).render('not-found', {robots:'noindex,follow'});
     if (req.params.slug !== digest.slug) return res.redirect(301, digestPath(digest));
-    const reportStatus = typeof req.query.lapor === 'string' && ['terkirim','batas','gagal'].includes(req.query.lapor) ? req.query.lapor : '';
-    res.render('digest', {digest, reportStatus, reportKinds:REPORT_KINDS, section:'artikel', category:digest.category, title:pageTitle(digest.title), description:digest.dek,
+    res.render('digest', {digest, reportKinds:REPORT_KINDS, section:'artikel', category:digest.category, title:pageTitle(digest.title), description:digest.dek,
       ogImage:digest.image, publishedTime:digest.publishedAt,
       jsonLd:jsonLd({'@context':'https://schema.org', '@graph':[breadcrumb([['Beranda','/'],['Artikel','/artikel'],
-        [categoryName(digest.category), `/artikel?kategori=${digest.category}`],[digest.title, digestPath(digest)]]), {'@type':'NewsArticle', headline:digest.title.slice(0,110), description:digest.dek,
+        [categoryName(digest.category), listingPath(digest.category)],[digest.title, digestPath(digest)]]), {'@type':'NewsArticle', headline:digest.title.slice(0,110), description:digest.dek,
         datePublished:digest.publishedAt, dateModified:digest.publishedAt, inLanguage:'id-ID', mainEntityOfPage:absolute(digestPath(digest)),
         ...(digest.image ? {image:[digest.image]} : {}), articleSection:categoryName(digest.category),
         author:{'@type':'Organization', name:'Redaksi lekakick', url:`${SITE_URL}/tentang`}, publisher:ORGANIZATION,
         citation:digest.sources.map(source => ({'@type':'NewsArticle', headline:source.title, url:source.url, publisher:{'@type':'Organization', name:source.source}}))}]}),
       related:digests.list().filter(item => item.id !== digest.id && item.category === digest.category).slice(0,3)});
   });
-  app.post('/artikel/:id/lapor', express.urlencoded({extended:false, limit:'4kb', parameterLimit:5}), async (req,res) => {
-    const digest = digests.list().find(item => item.id === req.params.id);
+  // Di Cloudflare rute ini ditangani functions/api/lapor.js dengan logika yang sama.
+  app.post('/api/lapor', express.urlencoded({extended:false, limit:'4kb', parameterLimit:6}), async (req,res) => {
+    const body = req.body as Record<string, unknown>;
+    const digest = digests.list().find(item => item.id === body.artikel);
     if (!digest) return res.status(404).render('not-found', {robots:'noindex,follow'});
     const back = (status: string) => res.redirect(303, `${digestPath(digest)}?lapor=${status}#lapor`);
-    const body = req.body as Record<string, unknown>;
     // Kolom "website" tersembunyi: hanya bot yang mengisinya.
     if (body.website) return back('terkirim');
     const kind = typeof body.jenis === 'string' && body.jenis in REPORT_KINDS ? body.jenis as keyof typeof REPORT_KINDS : undefined;
@@ -146,11 +163,10 @@ export function createApp(store: {snapshot(): Snapshot}, digests: {list(): Diges
     catch { return back('gagal'); }
   });
   app.get('/simpan', (_req,res) => res.render('saved', {robots:'noindex,follow', section:'simpan', title:'Bacaan saya — lekakick'}));
-  app.get('/api/berita', (req,res) => {
-    const ids = typeof req.query.ids === 'string' ? req.query.ids.split(',').filter(id => /^[a-f0-9]{16}$/.test(id)).slice(0,100) : [];
-    const items = digests.list().filter(item => ids.includes(item.id)).map(item => ({id:item.id, title:item.title, excerpt:item.dek, image:item.image,
-      source:'Redaksi lekakick', path:digestPath(item), categoryLabel:categoryName(item.category), dateLabel:date(item.publishedAt)}));
-    res.json({items});
+  // Indeks ringan untuk pencarian dan "Bacaan saya" yang berjalan di browser.
+  app.get('/api/artikel.json', (_req,res) => {
+    res.json({items:digests.list().map(item => ({id:item.id, title:item.title, excerpt:item.dek, image:item.image,
+      path:digestPath(item), category:item.category, categoryLabel:categoryName(item.category), dateLabel:date(item.publishedAt)}))});
   });
   app.get('/tentang', (_req,res) => res.render('info', {section:'tentang', title:'Tentang lekakick', kind:'about'}));
   app.get('/privasi', (_req,res) => res.render('info', {section:'privasi', title:'Privasi — lekakick', kind:'privacy'}));
@@ -162,7 +178,7 @@ export function createApp(store: {snapshot(): Snapshot}, digests: {list(): Diges
       {loc:'/', lastmod:newest}, ...(all.length ? [{loc:'/artikel', lastmod:newest}] : []),
       ...CATEGORIES.filter(c => c.id !== 'semua').flatMap(c => {
         const latest = all.find(item => item.category === c.id);
-        return latest ? [{loc:`/artikel?kategori=${c.id}`, lastmod:latest.publishedAt}] : [];
+        return latest ? [{loc:listingPath(c.id), lastmod:latest.publishedAt}] : [];
       }),
       {loc:'/tentang'}, {loc:'/privasi'},
       ...all.map(item => ({loc:digestPath(item), lastmod:item.publishedAt})),
