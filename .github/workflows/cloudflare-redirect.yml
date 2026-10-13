@@ -1,0 +1,43 @@
+name: Atur redirect www
+
+# Dijalankan manual (Actions → Atur redirect www → Run workflow). Memasang Single Redirect
+# www.lekakick.com → https://lekakick.com dengan path dan query tetap.
+# Token CLOUDFLARE_API_TOKEN perlu izin Zone → Zone: Read dan Zone → Single Redirect (Dynamic Redirect): Edit.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  redirect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Pasang aturan redirect
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ZONE: lekakick.com
+          DESCRIPTION: 'lekakick: www ke domain utama'
+        run: |
+          export CLOUDFLARE_API_TOKEN="$(printf %s "$CLOUDFLARE_API_TOKEN" | tr -d '[:space:]')"
+          api() { curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json' "$@"; }
+          zone_id=$(api "https://api.cloudflare.com/client/v4/zones?name=$ZONE" | jq -r '.result[0].id // empty')
+          if [ -z "$zone_id" ]; then echo "::error::Zona $ZONE tidak terlihat. Tambahkan izin Zone → Zone: Read untuk lekakick.com pada token."; exit 1; fi
+          url="https://api.cloudflare.com/client/v4/zones/$zone_id/rulesets/phases/http_request_dynamic_redirect/entrypoint"
+          current=$(api "$url")
+          if [ "$(echo "$current" | jq -r '.success')" != true ] && ! echo "$current" | jq -e '.errors[]? | select(.code == 10003)' >/dev/null; then
+            echo "::error::Tidak bisa membaca Redirect Rules: $(echo "$current" | jq -c '.errors')"; exit 1
+          fi
+          echo "Aturan yang sudah ada: $(echo "$current" | jq -c '[.result.rules[]? | {description, enabled, expression}]')"
+          # Aturan lain dipertahankan; aturan lama yang menyentuh www diganti dengan yang ini.
+          rule=$(jq -n --arg d "$DESCRIPTION" '{description:$d, enabled:true, action:"redirect",
+            expression:"(http.host eq \"www.lekakick.com\")",
+            action_parameters:{from_value:{status_code:301, preserve_query_string:true,
+              target_url:{expression:"concat(\"https://lekakick.com\", http.request.uri.path)"}}}}')
+          body=$(echo "$current" | jq --argjson rule "$rule" '{rules: ([.result.rules[]? | select((.expression | test("www")) | not) | del(.id, .version, .last_updated, .ref)] + [$rule])}')
+          result=$(api -X PUT "$url" --data "$body")
+          if [ "$(echo "$result" | jq -r '.success')" != true ]; then
+            echo "::error::Gagal memasang aturan: $(echo "$result" | jq -c '.errors')"; exit 1
+          fi
+          echo "Aturan aktif: $(echo "$result" | jq -c '[.result.rules[] | {description, enabled}]')"
