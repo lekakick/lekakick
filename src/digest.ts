@@ -28,7 +28,8 @@ function similarity(a: Set<string>, b: Set<string>): { shared: number; score: nu
 }
 
 // Jadwal, tautan siaran, dan prediksi tidak punya fakta peristiwa untuk dirangkum.
-const LOW_VALUE = /live streaming|link streaming|siaran langsung|jadwal|prediksi|link nonton/i;
+// "Jadwal" hanya disaring sebagai artikel jadwal, bukan berita yang menyebut jadwal ("keluhkan jadwal padat").
+const LOW_VALUE = /live streaming|link streaming|siaran langsung|^jadwal|jadwal (lengkap|siaran|tayang)|prediksi|link nonton/i;
 /** Kelompokkan berita dari penerbit berbeda yang membahas peristiwa yang sama. */
 export function findClusters(items: Article[], options: { now: Date; used: Set<string>; maxAgeHours?: number }): Article[][] {
   const cutoff = options.now.getTime() - (options.maxAgeHours ?? 36) * 3_600_000;
@@ -48,8 +49,8 @@ export function findClusters(items: Article[], options: { now: Date; used: Set<s
       const body = similarity(fullWords.get(seed.id)!, fullWords.get(other.id)!);
       if (title.shared >= 3 && title.score >= 0.5 && body.score >= 0.35) members.push(other);
     }
-    // Bahan terlalu tipis menghasilkan tulisan berulang; lewati.
-    if (members.length < 2 || members.reduce((sum, item) => sum + item.excerpt.length, 0) < 260) continue;
+    // Bahan terlalu tipis menghasilkan tulisan berulang; lewati. Cuplikan RSS umumnya 80-160 karakter per media.
+    if (members.length < 2 || members.reduce((sum, item) => sum + item.excerpt.length, 0) < 180) continue;
     members.forEach(member => taken.add(member.id));
     clusters.push(members.slice(0, 4));
   }

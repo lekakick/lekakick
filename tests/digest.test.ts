@@ -39,6 +39,12 @@ test('hanya peristiwa dari >=2 penerbit berbeda yang dikelompokkan; jadwal/strea
   assert.deepEqual(clusters[0]!.map(item => item.sourceId).sort(), ['antara', 'detik']);
   assert.equal(findClusters(items, {now, used: new Set([items[0]!.id])}).length, 0, 'artikel terpakai tidak dipakai ulang');
   assert.equal(findClusters(items, {now: new Date(now.getTime() + 48 * 3_600_000), used: new Set()}).length, 0, 'berita lama dilewati');
+  const news = (id: string, sourceId: string, title: string) => ({...items[0]!, id, sourceId, title,
+    excerpt: 'Thom Haye mengeluhkan padatnya jadwal Persib Bandung yang harus bermain tiga kali dalam sepekan.'});
+  assert.equal(findClusters([news('j1', 'detik', 'Thom Haye Keluhkan Jadwal Padat Persib'), news('j2', 'bola', 'Thom Haye Keluhkan Padatnya Jadwal Persib Bandung')],
+    {now, used: new Set()}).length, 1, 'berita yang menyebut jadwal tetap dirangkum');
+  assert.equal(findClusters([news('j1', 'detik', 'Jadwal Persib Bandung Pekan Ini'), news('j2', 'bola', 'Jadwal Lengkap Persib Bandung Pekan Ini')],
+    {now, used: new Set()}).length, 0, 'artikel jadwal tetap dilewati');
 });
 
 test('draf yang menyalin 7 kata beruntun dari sumber, terlalu pendek, atau memuat tautan ditolak', () => {
