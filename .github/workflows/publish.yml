@@ -79,10 +79,5 @@ jobs:
           status=$(api /user/tokens/verify | jq -r '.result.status // empty')
           [ -n "$status" ] || status=$(api "/accounts/$CLOUDFLARE_ACCOUNT_ID/tokens/verify" | jq -r '.result.status // "tidak valid"')
           echo "Status token Cloudflare: $status"
-          if api /accounts | jq -e --arg id "$CLOUDFLARE_ACCOUNT_ID" '[.result[]?.id] | index($id)' >/dev/null; then
-            echo "Account ID cocok dengan token"
-          else
-            echo "::error::Token tidak punya akses ke CLOUDFLARE_ACCOUNT_ID ini (akun yang terlihat: $(api /accounts | jq '.result | length'))"
-          fi
           npx wrangler pages project create lekakick --production-branch=main 2>/dev/null || true
           npx wrangler pages deploy out --project-name=lekakick --branch=main --commit-dirty=true
